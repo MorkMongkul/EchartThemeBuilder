@@ -77,22 +77,206 @@ body {
 }
 
 /* ---------------- App Main Frame ---------------- */
+/* Sidebar Header Bar */
+.sidebar-header-bar {
+  height: 42px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  background: var(--sidebar-bg);
+  flex-shrink: 0;
+}
+
+.sidebar-header-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: -0.1px;
+}
+
+.sidebar-header-title svg {
+  color: var(--accent);
+}
+
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebar-action-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sidebar-action-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent);
+}
+
+.sidebar-action-btn.active {
+  color: var(--accent);
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+/* Topbar Icon Button */
+.top-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: #CBD5E1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-right: 4px;
+}
+
+.top-icon-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent);
+}
+
+/* Toolbar Sidebar Quick Toggle */
+.toolbar-sidebar-btn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  color: #475569;
+  font-size: 11.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#main.dark-canvas .toolbar-sidebar-btn {
+  background: #16243A;
+  border-color: #1E2F46;
+  color: #94A3B8;
+}
+
+.toolbar-sidebar-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Floating Sidebar Reveal Handle */
+.floating-sidebar-tab {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  z-index: 45;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  border-radius: 0 18px 18px 0;
+  border: 1px solid var(--line);
+  border-left: none;
+  background: var(--sidebar-bg);
+  color: #E2E8F0;
+  font-size: 11.5px;
+  font-weight: 600;
+  display: none;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-4px);
+}
+
+.floating-sidebar-tab:hover {
+  transform: translateX(0);
+  background: #16243A;
+  color: var(--accent);
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
+  border-color: var(--accent);
+}
+
+/* ---------------- App Main Frame ---------------- */
 #app {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
-/* ---------------- Sidebar ---------------- */
+/* ---------------- Sidebar Transitions & Modes ---------------- */
 #sidebar {
-  width: 340px;
-  flex: 0 0 340px;
+  width: 350px;
+  flex: 0 0 350px;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   user-select: none;
+  transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              margin-left 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease,
+              transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: width, margin-left, transform;
+}
+
+/* Collapsed State */
+#app.sidebar-collapsed #sidebar {
+  width: 0px !important;
+  flex: 0 0 0px !important;
+  margin-left: -350px !important;
+  opacity: 0;
+  pointer-events: none;
+  border-right-color: transparent;
+}
+
+#app.sidebar-collapsed .floating-sidebar-tab {
+  display: inline-flex;
+}
+
+/* Floating Drawer Mode */
+#app.sidebar-floating #sidebar {
+  position: absolute;
+  top: 66px;
+  left: 16px;
+  bottom: 20px;
+  width: 360px !important;
+  flex: none !important;
+  margin-left: 0 !important;
+  z-index: 60;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(6, 182, 212, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+#app.sidebar-floating.sidebar-collapsed #sidebar {
+  transform: translateX(-400px);
+  opacity: 0;
+  pointer-events: none;
 }
 
 #sidebarContent {

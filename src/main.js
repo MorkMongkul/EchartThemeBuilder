@@ -242,6 +242,78 @@ window.openFocusMode = openFocusMode;
 window.switchViewMode = switchViewMode;
 
 /* ==================================================================
+   3b. Sidebar Hide / Reveal & Floating HUD Controller
+   ================================================================== */
+const sidebarState = {
+  collapsed: false,
+  floating: false
+};
+
+function triggerSmoothChartResize() {
+  const start = performance.now();
+  function loop(now) {
+    resizeAll();
+    if (now - start < 350) {
+      requestAnimationFrame(loop);
+    } else {
+      resizeAll();
+    }
+  }
+  requestAnimationFrame(loop);
+}
+
+function updateSidebarUI() {
+  const app = document.getElementById("app");
+  if (!app) return;
+  app.classList.toggle("sidebar-collapsed", sidebarState.collapsed);
+  app.classList.toggle("sidebar-floating", sidebarState.floating);
+
+  // Update topbar button icon
+  const topIcon = document.getElementById("sidebarToggleIcon");
+  if (topIcon) {
+    topIcon.innerHTML = sidebarState.collapsed
+      ? '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><path d="M11 9l3 3-3 3"/>'
+      : '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><path d="M14 9l-3 3 3 3"/>';
+  }
+
+  // Update toolbar toggle text
+  const toolbarText = document.getElementById("toolbarSidebarText");
+  if (toolbarText) {
+    toolbarText.textContent = sidebarState.collapsed ? "Show Controls" : "Hide Controls";
+  }
+
+  // Update floating button status in sidebar header
+  const floatBtn = document.getElementById("btnSidebarFloatToggle");
+  if (floatBtn) {
+    floatBtn.classList.toggle("active", sidebarState.floating);
+    floatBtn.title = sidebarState.floating ? "Switch to Docked Sidebar" : "Switch to Floating Drawer Mode";
+  }
+
+  triggerSmoothChartResize();
+}
+
+export function toggleSidebar(forceState) {
+  sidebarState.collapsed = typeof forceState === "boolean" ? forceState : !sidebarState.collapsed;
+  updateSidebarUI();
+  if (sidebarState.collapsed) {
+    showToast("Controls hidden (Press Ctrl+B to restore)");
+  } else {
+    showToast("Theme controls revealed");
+  }
+}
+
+export function toggleFloatingSidebar() {
+  sidebarState.floating = !sidebarState.floating;
+  if (sidebarState.floating) {
+    sidebarState.collapsed = false;
+  }
+  updateSidebarUI();
+  showToast(sidebarState.floating ? "Floating Drawer mode active" : "Docked Sidebar mode active");
+}
+window.toggleSidebar = toggleSidebar;
+window.toggleFloatingSidebar = toggleFloatingSidebar;
+
+/* ==================================================================
    4. Palette Swatches Management
    ================================================================== */
 function renderPaletteSwatches() {
@@ -478,6 +550,30 @@ function renderUploadPanel() {
    8. Event Listeners & Bootstrap
    ================================================================== */
 function bindEvents() {
+  // Sidebar Collapse / Reveal / Floating Toggles
+  const btnToggleSidebar = document.getElementById("btnToggleSidebar");
+  if (btnToggleSidebar) btnToggleSidebar.addEventListener("click", () => toggleSidebar());
+
+  const btnSidebarCollapse = document.getElementById("btnSidebarCollapse");
+  if (btnSidebarCollapse) btnSidebarCollapse.addEventListener("click", () => toggleSidebar(true));
+
+  const btnSidebarFloatToggle = document.getElementById("btnSidebarFloatToggle");
+  if (btnSidebarFloatToggle) btnSidebarFloatToggle.addEventListener("click", () => toggleFloatingSidebar());
+
+  const floatingSidebarReveal = document.getElementById("floatingSidebarReveal");
+  if (floatingSidebarReveal) floatingSidebarReveal.addEventListener("click", () => toggleSidebar(false));
+
+  const toolbarSidebarBtn = document.getElementById("toolbarSidebarBtn");
+  if (toolbarSidebarBtn) toolbarSidebarBtn.addEventListener("click", () => toggleSidebar());
+
+  // Global Shortcut: Ctrl+B or Cmd+B to toggle sidebar
+  window.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  });
+
   document.getElementById("btnModeDashboard").addEventListener("click", () => switchViewMode("dashboard"));
   document.getElementById("btnModeFocus").addEventListener("click", () => switchViewMode("focus"));
   document.getElementById("focusChartTypeSelect").addEventListener("change", e => {
