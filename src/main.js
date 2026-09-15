@@ -36,7 +36,7 @@ import {
 import { buildTheme } from './theme/builder.js';
 import { toThemeBuilderJSON, fromThemeBuilderJSON } from './theme/schema.js';
 import { downloadFile, copyToClipboard, formatJsSnippet } from './theme/exporter.js';
-import { updateWCAGAnalysis, applyCvdFilter } from './utils/accessibility.js';
+import { applyCvdFilter } from './utils/accessibility.js';
 
 /* ==================================================================
    1. State Management
@@ -202,7 +202,6 @@ function renderAll() {
   } else {
     renderFocusChart();
   }
-  updateWCAGAnalysis(state.palette, state.backgroundColor, state.bgTransparent);
   updateModalCodeViewer();
 }
 
@@ -348,18 +347,11 @@ function renderPaletteSwatches() {
       renderAll();
     });
 
-    const wcagBadge = document.createElement("div");
-    wcagBadge.className = "swatch-wcag-badge";
-    wcagBadge.innerHTML = '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-
     card.appendChild(colorInput);
     card.appendChild(hexLabel);
     card.appendChild(delBtn);
-    card.appendChild(wcagBadge);
     grid.appendChild(card);
   });
-
-  updateWCAGAnalysis(state.palette, state.backgroundColor, state.bgTransparent);
 }
 
 /* ==================================================================

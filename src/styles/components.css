@@ -253,27 +253,6 @@ input[type=range].ctrl-range {
   display: flex;
 }
 
-.swatch-wcag-badge {
-  position: absolute;
-  top: -5px;
-  left: -5px;
-  width: 16px;
-  height: 16px;
-  background: var(--warn);
-  color: #1a1200;
-  border-radius: 50%;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--sidebar-bg);
-  cursor: help;
-}
-
-.swatch-wcag-badge svg {
-  width: 10px;
-  height: 10px;
-}
-
 .palette-actions {
   display: flex;
   gap: 8px;
@@ -306,29 +285,6 @@ input[type=range].ctrl-range {
 .palette-btn:hover {
   border-color: var(--accent);
   color: #fff;
-}
-
-.contrast-card {
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 11.5px;
-  line-height: 1.4;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.contrast-card.ok {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #6EE7B7;
-}
-
-.contrast-card.warn {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #FCD34D;
 }
 
 /* ---------------- Buttons & Toggles ---------------- */
