@@ -31,6 +31,10 @@ import {
   buildTreemapOption,
   buildSunburstOption,
   buildWaterfallOption,
+  buildKpiSparklineOption,
+  buildKpiBarSparklineOption,
+  buildKpiRingOption,
+  buildKpiProgressOption,
   getFocusChartOption
 } from './charts/index.js';
 import { buildTheme } from './theme/builder.js';
@@ -63,6 +67,10 @@ const uploadState = {
 };
 
 const chartInstances = {
+  kpi1: null,
+  kpi2: null,
+  kpi3: null,
+  kpi4: null,
   line: null,
   bar: null,
   pie: null,
@@ -90,6 +98,39 @@ function registerCurrentTheme() {
 function initDashboardCharts() {
   registerCurrentTheme();
 
+  // 1. Executive Top KPI Micro-Charts
+  const kpiBinds = [
+    {
+      key: "kpi1",
+      id: "kpiChart1",
+      fn: () => buildKpiSparklineOption([780, 890, 1020, 1140, 1250, 1370, 1428], state.palette[0] || "#06B6D4")
+    },
+    {
+      key: "kpi2",
+      id: "kpiChart2",
+      fn: () => buildKpiProgressOption(100, state.palette[1] || "#3B82F6", state)
+    },
+    {
+      key: "kpi3",
+      id: "kpiChart3",
+      fn: () => buildKpiRingOption(94.6, state.palette[2] || "#10B981", state)
+    },
+    {
+      key: "kpi4",
+      id: "kpiChart4",
+      fn: () => buildKpiBarSparklineOption([18, 24, 30, 36, 42, 48], state.palette[3] || "#8B5CF6")
+    }
+  ];
+
+  kpiBinds.forEach(b => {
+    const el = document.getElementById(b.id);
+    if (!el) return;
+    if (chartInstances[b.key]) chartInstances[b.key].dispose();
+    chartInstances[b.key] = echarts.init(el, state.name);
+    chartInstances[b.key].setOption(b.fn());
+  });
+
+  // 2. Bento Main Chart Suite
   const binds = [
     { key: "cambodia", id: "gridChartCambodia", fn: () => buildCambodiaChoroplethOption(workingData.cambodiaProvinces, state) },
     { key: "map", id: "gridChartMap", fn: () => buildMapOption(workingData.map, worldMapStatus, state) },

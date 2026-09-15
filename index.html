@@ -586,6 +586,61 @@
         <!-- View 1: Bento Dashboard Layout -->
         <div id="dashboardGrid">
 
+          <!-- Row 0: Executive KPI Overview (4 Bento Metric Cards) -->
+          <div class="bento-kpi-row">
+            <!-- KPI 1: Research Datasets -->
+            <div class="bento-kpi-card" onclick="openFocusMode('kpiScorecard')">
+              <div class="kpi-card-header">
+                <span class="kpi-label">Research Datasets</span>
+                <span class="kpi-badge up">▲ +14.2%</span>
+              </div>
+              <div class="kpi-metric-wrap">
+                <div class="kpi-val">1,428</div>
+                <div class="kpi-subtext">Active datasets across 8 sectors</div>
+              </div>
+              <div id="kpiChart1" class="kpi-micro-canvas"></div>
+            </div>
+
+            <!-- KPI 2: Provincial Coverage -->
+            <div class="bento-kpi-card" onclick="openFocusMode('cambodiaChoropleth')">
+              <div class="kpi-card-header">
+                <span class="kpi-label">Provincial Coverage</span>
+                <span class="kpi-badge neutral">100% Active</span>
+              </div>
+              <div class="kpi-metric-wrap">
+                <div class="kpi-val">25 / 25</div>
+                <div class="kpi-subtext">National reach across Cambodia</div>
+              </div>
+              <div id="kpiChart2" class="kpi-micro-canvas"></div>
+            </div>
+
+            <!-- KPI 3: Data Quality & Completeness -->
+            <div class="bento-kpi-card" onclick="openFocusMode('gauge')">
+              <div class="kpi-card-header">
+                <span class="kpi-label">Data Quality Score</span>
+                <span class="kpi-badge ok">Optimal</span>
+              </div>
+              <div class="kpi-metric-wrap">
+                <div class="kpi-val">94.6%</div>
+                <div class="kpi-subtext">Completeness &amp; validity index</div>
+              </div>
+              <div id="kpiChart3" class="kpi-micro-canvas"></div>
+            </div>
+
+            <!-- KPI 4: Global Partnerships -->
+            <div class="bento-kpi-card" onclick="openFocusMode('map')">
+              <div class="kpi-card-header">
+                <span class="kpi-label">Global Partners</span>
+                <span class="kpi-badge up">▲ +6 Global</span>
+              </div>
+              <div class="kpi-metric-wrap">
+                <div class="kpi-val">48</div>
+                <div class="kpi-subtext">Bilateral datahub networks</div>
+              </div>
+              <div id="kpiChart4" class="kpi-micro-canvas"></div>
+            </div>
+          </div>
+
           <!-- Row 1: Hero Geographic Duo (2 + 2 cols) -->
           <!-- 1: Cambodia Provincial Choropleth Map -->
           <div class="chart-card bento-span-2 bento-hero">
@@ -1026,6 +1081,7 @@
                   <option value="parallel">Parallel Coordinates</option>
                 </optgroup>
                 <optgroup label="Flow, KPI &amp; Networks">
+                  <option value="kpiScorecard">Executive KPI Scorecard</option>
                   <option value="sankey">Flow Sankey Diagram</option>
                   <option value="radar">Multi-axis Radar</option>
                   <option value="gauge">Metric Gauge</option>

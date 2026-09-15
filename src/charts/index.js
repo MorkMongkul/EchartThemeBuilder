@@ -3,7 +3,16 @@ import { buildBarOption, buildHorizontalBarOption, buildWaterfallOption } from '
 import { buildScatterOption, buildHeatmapOption, buildBoxplotOption, buildParallelOption } from './distribution.js';
 import { buildPieOption, buildFunnelOption, buildTreemapOption, buildSunburstOption, buildRoseOption } from './pie-funnel.js';
 import { buildSankeyOption, buildMapOption, buildGraphOption, buildCambodiaChoroplethOption, buildCambodiaBubbleOption } from './flow-geo.js';
-import { buildRadarOption, buildGaugeOption, buildCandlestickOption } from './kpi.js';
+import {
+  buildRadarOption,
+  buildGaugeOption,
+  buildCandlestickOption,
+  buildKpiSparklineOption,
+  buildKpiBarSparklineOption,
+  buildKpiRingOption,
+  buildKpiProgressOption,
+  buildExecutiveScorecardOption
+} from './kpi.js';
 
 export {
   buildLineOption,
@@ -27,7 +36,12 @@ export {
   buildGraphOption,
   buildRadarOption,
   buildGaugeOption,
-  buildCandlestickOption
+  buildCandlestickOption,
+  buildKpiSparklineOption,
+  buildKpiBarSparklineOption,
+  buildKpiRingOption,
+  buildKpiProgressOption,
+  buildExecutiveScorecardOption
 };
 
 /**
@@ -101,6 +115,9 @@ export function getFocusChartOption(type, data, worldStatus, state) {
       break;
     case 'gauge':
       opt = buildGaugeOption(data.gauge, state);
+      break;
+    case 'kpiScorecard':
+      opt = buildExecutiveScorecardOption(data, state);
       break;
     case 'sankey':
       opt = buildSankeyOption(data.sankey, state);
