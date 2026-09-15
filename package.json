@@ -1,0 +1,18 @@
+{
+  "name": "cdri-echarts-theme-builder",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Visual Theme Builder and Explorer for Apache ECharts tailored to CDRI Datahub",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "echarts": "^5.5.0"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0",
+    "shadcn": "^4.21.0"
+  }
+}

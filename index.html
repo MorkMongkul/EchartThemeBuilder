@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECharts Theme Builder — CDRI Datahub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Hidden SVG for Colorblind Filters -->
+  <svg id="cvdFilter" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+    <filter id="protanopia"><feColorMatrix type="matrix" values="0.567, 0.433, 0, 0, 0 0.558, 0.442, 0, 0, 0 0, 0.242, 0.758, 0, 0 0, 0, 0, 1, 0"/></filter>
+    <filter id="deuteranopia"><feColorMatrix type="matrix" values="0.625, 0.375, 0, 0, 0 0.7, 0.3, 0, 0, 0 0, 0.3, 0.7, 0, 0 0, 0, 0, 1, 0"/></filter>
+    <filter id="tritanopia"><feColorMatrix type="matrix" values="0.95, 0.05, 0, 0, 0 0, 0.433, 0.567, 0, 0 0, 0.475, 0.525, 0, 0 0, 0, 0, 1, 0"/></filter>
+    <filter id="achromatopsia"><feColorMatrix type="matrix" values="0.299, 0.587, 0.114, 0, 0 0.299, 0.587, 0.114, 0, 0 0.299, 0.587, 0.114, 0, 0 0, 0, 0, 1, 0"/></filter>
+  </svg>
+
+  <!-- ---------------- Top Navigation Bar ---------------- -->
+  <header id="topbar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v18h18"/>
+          <path d="M18 9l-5 5-4-4-3 3"/>
+        </svg>
+      </div>
+      <div class="brand-title">
+        CDRI Datahub Theme Builder
+        <span class="brand-badge">ECharts 5.5</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <!-- Preset Selection -->
+      <select id="presetSelect" class="ctrl-select" style="width:190px;padding:5px 10px;font-size:12.5px;" title="Load Theme Preset">
+        <option value="cdriLight">CDRI Datahub (Light)</option>
+        <option value="cdriDark">CDRI Datahub (Dark)</option>
+        <option value="vintage">Vintage (Classic)</option>
+        <option value="macarons">Macarons (Pastel)</option>
+        <option value="shine">Shine (Vivid)</option>
+        <option value="infographic">Infographic</option>
+        <option value="roma">Roma (Corporate)</option>
+        <option value="cyberDark">Cyber Dark</option>
+      </select>
+
+      <!-- View Mode Switcher -->
+      <div class="view-mode-toggle">
+        <button class="view-mode-btn active" id="btnModeDashboard" title="View 9-chart responsive dashboard grid">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="view-mode-btn" id="btnModeFocus" title="Focus on a single full-size chart">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          Focus Single
+        </button>
+      </div>
+
+      <!-- Randomize / Reset -->
+      <button class="top-btn" id="btnRandomize" title="Randomize data points">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+          <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+        </svg>
+        Randomize
+      </button>
+      <button class="top-btn" id="btnReset" title="Reset to CDRI Datahub defaults">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+        </svg>
+        Reset
+      </button>
+
+      <!-- Import / Export -->
+      <button class="top-btn" id="btnImport" title="Import Theme Builder JSON">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        Import
+      </button>
+      <input type="file" id="importFileInput" accept=".json,application/json" style="display:none">
+      
+      <button class="top-btn primary" id="btnOpenExportModal">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export &amp; Code
+      </button>
+    </div>
+  </header>
+
+  <!-- ---------------- Main Workspace ---------------- -->
+  <div id="app">
+
+    <!-- ---------------- Sidebar Controls ---------------- -->
+    <aside id="sidebar">
+      <div id="sidebarContent">
+
+        <!-- Accordion 1: Theme Identity -->
+        <div class="acc-item open">
+          <div class="acc-header">
+            <div class="acc-title-wrap">
+              <span class="acc-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </span>
+              <span class="acc-title">Theme Information</span>
+            </div>
+            <span class="acc-chevron">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="acc-body">
+            <div class="control-group">
+              <label class="control-label" for="themeNameInput">Theme Identifier</label>
+              <input type="text" id="themeNameInput" class="ctrl-input" value="cdriDatahubTheme">
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="cvdSelect">Color Vision Deficiency (Preview)</label>
+              <select id="cvdSelect" class="ctrl-select">
+                <option value="none">Normal Vision</option>
+                <option value="protanopia">Protanopia (Red-blind)</option>
+                <option value="deuteranopia">Deuteranopia (Green-blind)</option>
+                <option value="tritanopia">Tritanopia (Blue-blind)</option>
+                <option value="achromatopsia">Achromatopsia (Monochrome)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion 2: Series Color Palette -->
+        <div class="acc-item open">
+          <div class="acc-header">
+            <div class="acc-title-wrap">
+              <span class="acc-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+                  <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+                  <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+                  <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+                  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+                </svg>
+              </span>
+              <span class="acc-title">Series Color Palette</span>
+              <span class="acc-badge" id="paletteCountBadge">8 colors</span>
+            </div>
+            <span class="acc-chevron">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="acc-body">
+            <div class="palette-grid" id="paletteGrid"></div>
+            
+            <div class="palette-actions">
+              <button class="palette-btn" id="btnAddColor">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Swatch
+              </button>
+              <button class="palette-btn" id="btnReversePalette">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 3 21 3 21 8"/>
+                  <line x1="4" y1="20" x2="21" y2="3"/>
+                  <polyline points="8 21 3 21 3 16"/>
+                  <line x1="15" y1="9" x2="20" y2="4"/>
+                </svg>
+                Reverse
+              </button>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="paletteQuickPreset">Palette Presets</label>
+              <select id="paletteQuickPreset" class="ctrl-select">
+                <option value="">-- Apply Quick Palette --</option>
+                <option value="datahub">CDRI Datahub Categorical (8)</option>
+                <option value="vibrant">Vibrant Tech (8)</option>
+                <option value="warm">Warm Terracotta (6)</option>
+                <option value="cool">Oceanic Cyan/Blue (6)</option>
+                <option value="forest">Natural Greens (6)</option>
+                <option value="highcontrast">High Contrast (6)</option>
+              </select>
+            </div>
+
+            <div class="contrast-card" id="wcagBadge"></div>
+          </div>
+        </div>
+
+        <!-- Accordion 3: Canvas & Global Styles -->
+        <div class="acc-item">
+          <div class="acc-header">
+            <div class="acc-title-wrap">
+              <span class="acc-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <line x1="3" y1="9" x2="21" y2="9"/>
+                  <line x1="9" y1="21" x2="9" y2="9"/>
+                </svg>
+              </span>
+              <span class="acc-title">Canvas &amp; Typography</span>
+            </div>
+            <span class="acc-chevron">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="acc-body">
+            <div class="control-group">
+              <label class="control-label">Background Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlBgColor" class="color-swatch-picker" value="#ffffff">
+                <input type="text" id="ctrlBgColorHex" class="ctrl-input color-hex-text" value="#ffffff">
+              </div>
+              <div style="margin-top:6px;">
+                <div class="toggle-control">
+                  <label for="ctrlBgTransparent">Transparent Background</label>
+                  <input type="checkbox" id="ctrlBgTransparent">
+                </div>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Title Text Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlTitleColor" class="color-swatch-picker" value="#0B1220">
+                <input type="text" id="ctrlTitleColorHex" class="ctrl-input color-hex-text" value="#0B1220">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Subtitle Text Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlSubtitleColor" class="color-swatch-picker" value="#64748B">
+                <input type="text" id="ctrlSubtitleColorHex" class="ctrl-input color-hex-text" value="#64748B">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label">Body / Axis Text Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlTextColor" class="color-swatch-picker" value="#233A66">
+                <input type="text" id="ctrlTextColorHex" class="ctrl-input color-hex-text" value="#233A66">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="ctrlFontFamily">Font Family</label>
+              <select id="ctrlFontFamily" class="ctrl-select">
+                <option value="Inter, sans-serif">Inter (Datahub default)</option>
+                <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">System Sans</option>
+                <option value="'Roboto', sans-serif">Roboto</option>
+                <option value="'JetBrains Mono', monospace">Monospace</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion 4: Coordinate Axes (X / Y) -->
+        <div class="acc-item">
+          <div class="acc-header">
+            <div class="acc-title-wrap">
+              <span class="acc-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="3" y1="21" x2="21" y2="21"/>
+                  <line x1="3" y1="3" x2="3" y2="21"/>
+                  <line x1="3" y1="12" x2="21" y2="12"/>
+                  <line x1="12" y1="3" x2="12" y2="21"/>
+                </svg>
+              </span>
+              <span class="acc-title">Coordinate Axes</span>
+            </div>
+            <span class="acc-chevron">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="acc-body">
+            <div class="control-group">
+              <div class="toggle-control">
+                <label for="ctrlAxisLineShow">Show Axis Line</label>
+                <input type="checkbox" id="ctrlAxisLineShow" checked>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Axis Line Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlAxisLineColor" class="color-swatch-picker" value="#D1D5DB">
+                <input type="text" id="ctrlAxisLineColorHex" class="ctrl-input color-hex-text" value="#D1D5DB">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <div class="toggle-control">
+                <label for="ctrlSplitLineShow">Show Split Gridlines</label>
+                <input type="checkbox" id="ctrlSplitLineShow" checked>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Split Gridline Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlSplitLineColor" class="color-swatch-picker" value="#E5E7EB">
+                <input type="text" id="ctrlSplitLineColorHex" class="ctrl-input color-hex-text" value="#E5E7EB">
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="ctrlSplitLineType">Gridline Style</label>
+              <select id="ctrlSplitLineType" class="ctrl-select">
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion 5: Series Visual Styling -->
+        <div class="acc-item">
+          <div class="acc-header">
+            <div class="acc-title-wrap">
+              <span class="acc-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                  <polyline points="16 7 22 7 22 13"/>
+                </svg>
+              </span>
+              <span class="acc-title">Series Styling (Line, Bar, etc.)</span>
+            </div>
+            <span class="acc-chevron">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="acc-body">
+            <!-- Line Options -->
+            <div class="control-group">
+              <label class="control-label" for="ctrlLineWidth">Line Stroke Width <span class="val" id="valLineWidth">2px</span></label>
+              <input type="range" id="ctrlLineWidth" class="ctrl-range" min="1" max="6" value="2">
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="ctrlSymbolSize">Line / Scatter Symbol Size <span class="val" id="valSymbolSize">6px</span></label>
+              <input type="range" id="ctrlSymbolSize" class="ctrl-range" min="0" max="14" value="6">
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="ctrlSymbolType">Symbol Marker Shape</label>
+              <select id="ctrlSymbolType" class="ctrl-select">
+                <option value="emptyCircle">Empty Circle</option>
+                <option value="circle">Solid Circle</option>
+                <option value="rect">Rectangle</option>
+                <option value="roundRect">Rounded Rect</option>
+                <option value="triangle">Triangle</option>
+                <option value="diamond">Diamond</option>
+                <option value="pin">Pin</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <div class="toggle-control">
+                <label for="ctrlLineSmooth">Smooth Line Curves</label>
+                <input type="checkbox" id="ctrlLineSmooth">
+              </div>
+            </div>
+
+            <!-- Bar Options -->
+            <div class="control-group">
+              <label class="control-label" for="ctrlBarRadius">Bar Corner Radius <span class="val" id="valBarRadius">4px</span></label>
+              <input type="range" id="ctrlBarRadius" class="ctrl-range" min="0" max="14" value="4">
+            </div>
+
+            <!-- Pie Options -->
+            <div class="control-group">
+              <label class="control-label" for="ctrlPieRadius">Pie/Donut Corner Radius <span class="val" id="valPieRadius">4px</span></label>
+              <input type="range" id="ctrlPieRadius" class="ctrl-range" min="0" max="12" value="4">
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion 6: Tooltip & Legend -->
+        <div class="acc-item">
+          <div class="acc-header">
+            <div class="acc-title-wrap">
+              <span class="acc-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </span>
+              <span class="acc-title">Legend &amp; Tooltip</span>
+            </div>
+            <span class="acc-chevron">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="acc-body">
+            <div class="control-group">
+              <label class="control-label">Tooltip Background</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlTooltipBg" class="color-swatch-picker" value="#0F172A">
+                <input type="text" id="ctrlTooltipBgHex" class="ctrl-input color-hex-text" value="#0F172A">
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">Tooltip Text Color</label>
+              <div class="color-picker-row">
+                <input type="color" id="ctrlTooltipText" class="color-swatch-picker" value="#F8FAFC">
+                <input type="text" id="ctrlTooltipTextHex" class="ctrl-input color-hex-text" value="#F8FAFC">
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="ctrlTooltipBorderRadius">Tooltip Corner Radius <span class="val" id="valTooltipRadius">6px</span></label>
+              <input type="range" id="ctrlTooltipBorderRadius" class="ctrl-range" min="0" max="12" value="6">
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion 7: Data Source & Upload -->
+        <div class="acc-item">
+          <div class="acc-header">
+            <div class="acc-title-wrap">
+              <span class="acc-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                </svg>
+              </span>
+              <span class="acc-title">Data Source (Upload / Custom)</span>
+            </div>
+            <span class="acc-chevron">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+          <div class="acc-body">
+            <div class="control-group">
+              <div class="view-mode-toggle" style="width:100%;">
+                <button class="view-mode-btn active" id="btnSourceSample" style="flex:1;">Sample Metrics</button>
+                <button class="view-mode-btn" id="btnSourceUpload" style="flex:1;">Custom File</button>
+              </div>
+            </div>
+            <div id="sidebarUploadArea" style="display:none;margin-top:10px;">
+              <button class="palette-btn" id="btnTriggerUpload" style="width:100%;padding:8px;">Choose CSV / JSON File</button>
+              <input type="file" id="customFileInput" accept=".csv,.json,text/csv,application/json" style="display:none">
+              <div id="sidebarUploadFileLabel" style="font-size:11px;color:var(--muted);margin-top:6px;word-break:break-all;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ---------------- Main Preview Workspace ---------------- -->
+    <main id="main">
+      <!-- Main Toolbar -->
+      <div id="mainToolbar">
+        <div class="view-heading">
+          <h2 id="viewHeadingTitle">Theme Preview Bento Dashboard</h2>
+          <span class="meta" id="viewHeadingMeta">Synchronized live preview across 14 Bento-arranged chart families</span>
+        </div>
+
+        <div class="canvas-tools">
+          <button class="canvas-mode-btn" id="btnToggleCanvasBg" title="Toggle between light and dark canvas background">
+            <span id="canvasBgIcon" style="display:inline-flex;align-items:center;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </span>
+            <span id="canvasBgText">Dark Canvas</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Workspace Stage -->
+      <div id="canvasStage">
+
+        <!-- View 1: Bento Dashboard Layout -->
+        <div id="dashboardGrid">
+
+          <!-- Row 1: Hero Geographic Duo (2 + 2 cols) -->
+          <!-- 1: Cambodia Provincial Choropleth Map -->
+          <div class="chart-card bento-span-2 bento-hero">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+                Cambodia Provincial Indicators
+                <span class="bento-tag">Regional Map</span>
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('cambodiaChoropleth')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartCambodia" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 2: World Research Partnerships Map -->
+          <div class="chart-card bento-span-2 bento-hero">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Global Research Partnerships
+                <span class="bento-tag">World Map</span>
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('map')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartMap" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- Row 2: Hierarchical & Timeline Duo (2 + 2 cols) -->
+          <!-- 3: Hierarchical Sector Treemap -->
+          <div class="chart-card bento-span-2 bento-medium">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="12" y1="12" x2="12" y2="21"/><line x1="12" y1="3" x2="12" y2="12"/><line x1="12" y1="7.5" x2="21" y2="7.5"/></svg>
+                Datasets Distributed by Sector (Treemap)
+                <span class="bento-tag">Hierarchical</span>
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('treemap')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartTreemap" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 4: Multi-series Line Chart -->
+          <div class="chart-card bento-span-2 bento-medium">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+                Quarterly Trend &amp; Trajectory
+                <span class="bento-tag">Timeline</span>
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('line')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartLine" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- Row 3: Core Analytics Quartet (1 + 1 + 1 + 1 cols) -->
+          <!-- 5: Stacked Bar Chart -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="4"/><line x1="12" y1="20" x2="12" y2="10"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+                Sector Funding Sources
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('stackedBar')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartBar" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 6: Doughnut Chart -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v6"/><path d="M12 16v6"/></svg>
+                Datasets Published
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('doughnut')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartPie" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 7: Radial Multi-tier Sunburst -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="6" stroke-dasharray="2 2"/><circle cx="12" cy="12" r="10"/></svg>
+                Sector Sunburst
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('sunburst')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartSunburst" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 8: Metric Gauge KPI -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-10 10c0 4.25 2.65 7.89 6.42 9.34"/><path d="M22 12A10 10 0 0 0 12 2"/><path d="M12 12l4-4"/><circle cx="12" cy="12" r="2"/></svg>
+                Data Completeness
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('gauge')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartGauge" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- Row 4: Flow & Matrix Duo (2 + 2 cols) -->
+          <!-- 9: Flow Sankey -->
+          <div class="chart-card bento-span-2 bento-medium">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="12" r="3"/><path d="M9 6h3a3 3 0 0 1 3 3v3"/><path d="M9 18h3a3 3 0 0 0 3-3v-3"/></svg>
+                Funding &amp; Survey Allocation Flow
+                <span class="bento-tag">Flow</span>
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('sankey')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartSankey" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 10: Sector Activity Heatmap -->
+          <div class="chart-card bento-span-2 bento-medium">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Quarterly Sector Research Intensity
+                <span class="bento-tag">Matrix</span>
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('heatmap')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartHeatmap" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- Row 5: Statistical & Variance Quartet (1 + 1 + 1 + 1 cols) -->
+          <!-- 11: Scatter / Bubble Chart -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="10.5" r="3.5"/><circle cx="11.5" cy="16.5" r="2.5"/></svg>
+                Volume vs Impact
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('bubble')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartScatter" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 12: Radar Chart -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 18 20 6 20 2 8.5 12 2"/><circle cx="12" cy="12" r="4"/></svg>
+                Annual Benchmark
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('radar')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartRadar" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 13: Candlestick (K-Line) -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="2" x2="8" y2="6"/><rect x="5" y="6" width="6" height="10" rx="1"/><line x1="8" y1="16" x2="8" y2="22"/><line x1="16" y1="2" x2="16" y2="9"/><rect x="13" y="9" width="6" height="7" rx="1"/><line x1="16" y1="16" x2="16" y2="22"/></svg>
+                Weekly Dispersion
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('candlestick')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartCandlestick" class="grid-chart-canvas"></div></div>
+          </div>
+
+          <!-- 14: Waterfall Chart -->
+          <div class="chart-card bento-compact">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="20" x2="21" y2="20"/><rect x="4" y="6" width="3" height="14"/><rect x="9" y="4" width="3" height="8"/><rect x="14" y="10" width="3" height="10"/><rect x="19" y="8" width="3" height="12"/></svg>
+                Variance Bridge
+              </div>
+              <button class="chart-focus-btn" onclick="openFocusMode('waterfall')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                Focus
+              </button>
+            </div>
+            <div class="chart-card-body"><div id="gridChartWaterfall" class="grid-chart-canvas"></div></div>
+          </div>
+
+        </div>
+
+        <!-- View 2: Focused Single Chart View -->
+        <div id="focusView">
+          <div class="focus-controls-bar">
+            <div class="focus-select-wrap">
+              <label for="focusChartTypeSelect">Inspect Chart Type:</label>
+              <select id="focusChartTypeSelect">
+                <optgroup label="Geographic &amp; Spatial">
+                  <option value="cambodiaChoropleth">Cambodia Provincial Choropleth</option>
+                  <option value="cambodiaBubble">Cambodia Provincial Bubble Map</option>
+                  <option value="map">World Map (Choropleth)</option>
+                </optgroup>
+                <optgroup label="Hierarchical &amp; Part-to-Whole">
+                  <option value="treemap">Hierarchical Treemap</option>
+                  <option value="sunburst">Multi-tier Sunburst</option>
+                  <option value="pie">Pie Chart</option>
+                  <option value="doughnut">Doughnut Chart</option>
+                  <option value="rose">Nightingale Rose Chart</option>
+                  <option value="funnel">Funnel Chart</option>
+                </optgroup>
+                <optgroup label="Line &amp; Area (Trends)">
+                  <option value="line">Line Chart</option>
+                  <option value="lineSmooth">Smooth Line Chart</option>
+                  <option value="area">Area Chart</option>
+                  <option value="stackedArea">Stacked Area Chart</option>
+                </optgroup>
+                <optgroup label="Bar &amp; Variance">
+                  <option value="bar">Standard Bar</option>
+                  <option value="stackedBar">Stacked Bar</option>
+                  <option value="horizontalBar">Horizontal Bar</option>
+                  <option value="waterfall">Waterfall (Variance Bridge)</option>
+                </optgroup>
+                <optgroup label="Distributions &amp; Statistics">
+                  <option value="scatter">Scatter Plot</option>
+                  <option value="bubble">Bubble Chart</option>
+                  <option value="heatmap">Heatmap Matrix</option>
+                  <option value="boxplot">Boxplot Distribution</option>
+                  <option value="parallel">Parallel Coordinates</option>
+                </optgroup>
+                <optgroup label="Flow, KPI &amp; Networks">
+                  <option value="sankey">Flow Sankey Diagram</option>
+                  <option value="radar">Multi-axis Radar</option>
+                  <option value="gauge">Metric Gauge</option>
+                  <option value="candlestick">Candlestick (K-Line)</option>
+                  <option value="graph">Network Graph</option>
+                </optgroup>
+              </select>
+            </div>
+            <button class="top-btn" onclick="switchViewMode('dashboard')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Back to Dashboard
+            </button>
+          </div>
+
+          <!-- Upload Information & Column Mapping Container -->
+          <div id="uploadPanel">
+            <div id="uploadSummary"></div>
+            <div id="uploadPreviewWrap"><table id="uploadPreviewTable"></table></div>
+            <div id="mappingArea" style="margin-top:12px;"></div>
+            <div id="uploadMsg" style="margin-top:8px;font-size:12px;"></div>
+          </div>
+
+          <div class="focus-card">
+            <div id="focusChart"></div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ---------------- Code & Export Modal ---------------- -->
+  <dialog id="exportModal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export ECharts Theme
+      </div>
+      <button class="modal-close-btn" id="btnCloseExportModal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-tabs">
+      <button class="modal-tab-btn active" data-tab="builderJson">Theme Builder JSON</button>
+      <button class="modal-tab-btn" data-tab="nativeJson">Native Theme JSON</button>
+      <button class="modal-tab-btn" data-tab="jsSnippet">JavaScript / ESM Snippet</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="code-viewer" id="modalCodeViewer"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="top-btn" id="btnCopyModalCode">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy to Clipboard
+      </button>
+      <div class="modal-actions">
+        <button class="top-btn primary" id="btnDownloadJson">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download .json
+        </button>
+        <button class="top-btn primary" id="btnDownloadJs">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download .js
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast -->
+  <div id="toast">
+    <span id="toastIcon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </span>
+    <span id="toastMsg">Action completed!</span>
+  </div>
+
+  <!-- Vite Modular Application Entry Point -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

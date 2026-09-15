@@ -1,0 +1,2986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECharts Theme Builder — CDRI Datahub</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js" integrity="sha512-k37wQcV4v2h6jgYf5IUz1MoSKPpDs630XGSmCaCCOXxy2awgAWKHGZWr9nMyGgk3IOxA1NxdkN8r1JHgkUtMoQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B1220;
+    --sidebar-bg: #0B1322;
+    --panel: #111C2E;
+    --panel-hover: #16243A;
+    --panel-active: #1A2C46;
+    --line: #202F44;
+    --line-light: #2E4059;
+    --paper: #F3F6FA;
+    --paper-dark: #070C15;
+    --muted: #8292A7;
+    --text: #E5ECF5;
+    --accent: #06B6D4;
+    --accent-hover: #22D3EE;
+    --accent-ink: #07151D;
+    --accent-glow: rgba(6, 182, 212, 0.25);
+    --success: #10B981;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+    --radius: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body {
+    display: flex;
+    flex-direction: column;
+    background: var(--paper);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  /* ---------------- Top Navigation Bar ---------------- */
+  #topbar {
+    height: 56px;
+    background: var(--sidebar-bg);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+    z-index: 50;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-logo {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #06B6D4, #3B82F6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 15px;
+    box-shadow: 0 2px 8px var(--accent-glow);
+  }
+  .brand-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    background: rgba(6, 182, 212, 0.15);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .view-mode-toggle {
+    display: flex;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 2px;
+  }
+  .view-mode-btn {
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .view-mode-btn.active {
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .view-mode-btn:hover:not(.active) {
+    color: #fff;
+  }
+
+  .top-btn {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+  .top-btn:hover {
+    background: var(--panel-hover);
+    border-color: var(--line-light);
+    color: #fff;
+  }
+  .top-btn.primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .top-btn.primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+
+  /* ---------------- App Workspace Layout ---------------- */
+  #app {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ---------------- Sidebar (Deep Theme Controls) ---------------- */
+  #sidebar {
+    width: 340px;
+    flex: 0 0 340px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  #sidebarContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px 40px;
+    scrollbar-gutter: stable;
+  }
+  #sidebarContent::-webkit-scrollbar { width: 6px; }
+  #sidebarContent::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+  #sidebarContent::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* Accordion Component */
+  .acc-item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+  .acc-item:focus-within, .acc-item:hover {
+    border-color: var(--line-light);
+  }
+  .acc-item.open {
+    border-color: rgba(6, 182, 212, 0.4);
+  }
+
+  .acc-header {
+    padding: 11px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: var(--panel);
+    transition: background 0.15s ease;
+  }
+  .acc-header:hover { background: var(--panel-hover); }
+  .acc-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .acc-icon {
+    font-size: 14px;
+    opacity: 0.85;
+    width: 18px;
+    text-align: center;
+  }
+  .acc-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.1px;
+  }
+  .acc-badge {
+    font-size: 10px;
+    background: rgba(255,255,255,0.08);
+    color: var(--muted);
+    padding: 1px 6px;
+    border-radius: 10px;
+  }
+  .acc-chevron {
+    color: var(--muted);
+    font-size: 11px;
+    transition: transform 0.2s ease;
+  }
+  .acc-item.open .acc-chevron {
+    transform: rotate(180deg);
+  }
+  .acc-body {
+    padding: 12px 14px 14px;
+    border-top: 1px solid var(--line);
+    display: none;
+    background: #0D1625;
+  }
+  .acc-item.open .acc-body {
+    display: block;
+  }
+
+  /* Form Controls */
+  .control-group {
+    margin-bottom: 14px;
+  }
+  .control-group:last-child {
+    margin-bottom: 0;
+  }
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .control-label span.val {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: none;
+  }
+
+  .ctrl-input, select.ctrl-select {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.15s ease;
+  }
+  .ctrl-input:focus, select.ctrl-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+
+  /* Range Sliders */
+  input[type=range].ctrl-range {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+  }
+
+  /* Toggle row */
+  .toggle-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+  .toggle-control:hover { border-color: var(--line-light); }
+  .toggle-control label { cursor: pointer; color: var(--text); }
+  .toggle-control input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
+
+  /* Color Input Swatch Row */
+  .color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .color-swatch-picker {
+    width: 34px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .color-hex-text {
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* Dynamic Palette Manager */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .palette-swatch-card {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+  .palette-swatch-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .palette-swatch-card input[type=color] {
+    width: 100%;
+    height: 28px;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .palette-swatch-hex {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .palette-swatch-del {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 16px;
+    height: 16px;
+    background: var(--danger);
+    color: #fff;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    cursor: pointer;
+    border: 1px solid var(--sidebar-bg);
+  }
+  .palette-swatch-card:hover .palette-swatch-del {
+    display: flex;
+  }
+  .swatch-wcag-badge {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 16px;
+    height: 16px;
+    background: var(--warn);
+    color: #1a1200;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    border: 1px solid var(--sidebar-bg);
+    cursor: help;
+  }
+  .palette-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .palette-btn {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 6px 8px;
+    border-radius: 5px;
+    font-size: 11.5px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+  .palette-btn:hover {
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* Accessibility / CVD filter bar */
+  .contrast-card {
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .contrast-card.ok {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6EE7B7;
+  }
+  .contrast-card.warn {
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #FCD34D;
+  }
+
+  /* ---------------- Main Content Workspace ---------------- */
+  #main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    background: var(--paper);
+    transition: background 0.2s ease;
+  }
+  #main.dark-canvas {
+    background: var(--paper-dark);
+  }
+
+  #mainToolbar {
+    height: 48px;
+    background: #fff;
+    border-bottom: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+  }
+  #main.dark-canvas #mainToolbar {
+    background: #0E1726;
+    border-color: #1E293B;
+  }
+
+  .view-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .view-heading h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0;
+  }
+  #main.dark-canvas .view-heading h2 { color: #F8FAFC; }
+  .view-heading span.meta {
+    font-size: 12px;
+    color: #64748B;
+  }
+  #main.dark-canvas .view-heading span.meta { color: #94A3B8; }
+
+  .canvas-tools {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .canvas-mode-btn {
+    background: none;
+    border: 1px solid #CBD5E1;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #main.dark-canvas .canvas-mode-btn {
+    border-color: #334155;
+    color: #CBD5E1;
+  }
+  .canvas-mode-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Scrollable Workspace Stage */
+  #canvasStage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* ---------------- Dashboard Grid View ---------------- */
+  #dashboardGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 1400px) {
+    #dashboardGrid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 960px) {
+    #dashboardGrid { grid-template-columns: 1fr; }
+  }
+
+  .chart-card {
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    height: 340px;
+  }
+  #main.dark-canvas .chart-card {
+    background: #111C2E;
+    border-color: #1E2E44;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .chart-card:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  }
+
+  .chart-card-header {
+    height: 38px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #F1F5F9;
+    background: #FAFCFE;
+  }
+  #main.dark-canvas .chart-card-header {
+    background: #16243A;
+    border-color: #1E2F46;
+  }
+  .chart-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #main.dark-canvas .chart-card-title { color: #E2E8F0; }
+
+  .chart-focus-btn {
+    background: none;
+    border: none;
+    color: #94A3B8;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+  }
+  .chart-focus-btn:hover {
+    color: var(--accent);
+    background: rgba(6, 182, 212, 0.1);
+  }
+
+  .chart-card-body {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .grid-chart-canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ---------------- Single Focus View ---------------- */
+  #focusView {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .focus-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 10px 16px;
+  }
+  #main.dark-canvas .focus-controls-bar {
+    background: #111C2E;
+    border-color: #1E2E44;
+  }
+  .focus-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .focus-select-wrap label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+  }
+  #main.dark-canvas .focus-select-wrap label { color: #94A3B8; }
+  .focus-select-wrap select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #CBD5E1;
+    font-size: 13px;
+    background: #fff;
+    color: #0F172A;
+  }
+  #main.dark-canvas .focus-select-wrap select {
+    background: #16243A;
+    border-color: #24354D;
+    color: #F8FAFC;
+  }
+
+  .focus-card {
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 16px;
+    height: 560px;
+    position: relative;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  }
+  #main.dark-canvas .focus-card {
+    background: #111C2E;
+    border-color: #1E2E44;
+  }
+  #focusChart {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Upload Panel Inside Focus View */
+  #uploadPanel {
+    display: none;
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  #main.dark-canvas #uploadPanel {
+    background: #111C2E;
+    border-color: #1E2E44;
+    color: #CBD5E1;
+  }
+  #uploadSummary { font-weight: 600; color: #0F172A; }
+  #main.dark-canvas #uploadSummary { color: #F8FAFC; }
+  #uploadPreviewWrap {
+    overflow: auto;
+    max-height: 160px;
+    margin-top: 10px;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+  }
+  #uploadPreviewTable { border-collapse: collapse; width: 100%; font-size: 11.5px; }
+  #uploadPreviewTable th, #uploadPreviewTable td {
+    border-bottom: 1px solid #E2E8F0;
+    padding: 5px 8px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  #uploadPreviewTable th { background: #F8FAFC; color: #475569; position: sticky; top: 0; }
+  #main.dark-canvas #uploadPreviewTable th { background: #16243A; color: #94A3B8; border-color: #24354D; }
+  #main.dark-canvas #uploadPreviewTable td { border-color: #24354D; }
+
+  /* ---------------- Modal Dialog (Code & Export) ---------------- */
+  dialog#exportModal {
+    margin: auto;
+    border: 1px solid var(--line-light);
+    border-radius: 12px;
+    background: var(--sidebar-bg);
+    color: var(--text);
+    width: 90%;
+    max-width: 820px;
+    max-height: 85vh;
+    padding: 0;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    outline: none;
+  }
+  dialog#exportModal::backdrop {
+    background: rgba(4, 9, 17, 0.75);
+    backdrop-filter: blur(4px);
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-close-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+  .modal-close-btn:hover { color: #fff; }
+
+  .modal-tabs {
+    display: flex;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .modal-tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 12px 16px;
+    cursor: pointer;
+    position: relative;
+    font-family: inherit;
+  }
+  .modal-tab-btn.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .modal-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .modal-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .code-viewer {
+    background: #060B13;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #CBD5E1;
+    height: 380px;
+    overflow: auto;
+    white-space: pre;
+    line-height: 1.5;
+  }
+
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel);
+  }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 100;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Color Blind Simulator SVG Filter */
+  #cvdFilter { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Hidden SVG for Colorblind Filters -->
+<svg id="cvdFilter" xmlns="http://www.w3.org/2000/svg">
+  <filter id="protanopia"><feColorMatrix type="matrix" values="0.567, 0.433, 0, 0, 0 0.558, 0.442, 0, 0, 0 0, 0.242, 0.758, 0, 0 0, 0, 0, 1, 0"/></filter>
+  <filter id="deuteranopia"><feColorMatrix type="matrix" values="0.625, 0.375, 0, 0, 0 0.7, 0.3, 0, 0, 0 0, 0.3, 0.7, 0, 0 0, 0, 0, 1, 0"/></filter>
+  <filter id="tritanopia"><feColorMatrix type="matrix" values="0.95, 0.05, 0, 0, 0 0, 0.433, 0.567, 0, 0 0, 0.475, 0.525, 0, 0 0, 0, 0, 1, 0"/></filter>
+  <filter id="achromatopsia"><feColorMatrix type="matrix" values="0.299, 0.587, 0.114, 0, 0 0.299, 0.587, 0.114, 0, 0 0.299, 0.587, 0.114, 0, 0 0, 0, 0, 1, 0"/></filter>
+</svg>
+
+<!-- ---------------- Top Navigation Bar ---------------- -->
+<header id="topbar">
+  <div class="brand">
+    <div class="brand-logo">E</div>
+    <div class="brand-title">
+      CDRI Datahub Theme Builder
+      <span class="brand-badge">ECharts 5.5</span>
+    </div>
+  </div>
+
+  <div class="top-actions">
+    <!-- Preset Selection -->
+    <select id="presetSelect" class="ctrl-select" style="width:190px;padding:5px 10px;font-size:12.5px;" title="Load Theme Preset">
+      <option value="cdriLight">CDRI Datahub (Light)</option>
+      <option value="cdriDark">CDRI Datahub (Dark)</option>
+      <option value="vintage">Vintage (Classic)</option>
+      <option value="macarons">Macarons (Pastel)</option>
+      <option value="shine">Shine (Vivid)</option>
+      <option value="infographic">Infographic</option>
+      <option value="roma">Roma (Corporate)</option>
+      <option value="cyberDark">Cyber Dark</option>
+    </select>
+
+    <!-- View Mode Switcher -->
+    <div class="view-mode-toggle">
+      <button class="view-mode-btn active" id="btnModeDashboard" title="View 9-chart responsive dashboard grid">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="view-mode-btn" id="btnModeFocus" title="Focus on a single full-size chart">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        Focus Single
+      </button>
+    </div>
+
+    <!-- Randomize / Reset -->
+    <button class="top-btn" id="btnRandomize" title="Randomize data points">&#127922; Randomize</button>
+    <button class="top-btn" id="btnReset" title="Reset to CDRI Datahub defaults">&#8635; Reset</button>
+
+    <!-- Import / Export -->
+    <button class="top-btn" id="btnImport" title="Import Theme Builder JSON">&#8593; Import</button>
+    <input type="file" id="importFileInput" accept=".json,application/json" style="display:none">
+    
+    <button class="top-btn primary" id="btnOpenExportModal">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export &amp; Code
+    </button>
+  </div>
+</header>
+
+<!-- ---------------- Main Workspace ---------------- -->
+<div id="app">
+
+  <!-- ---------------- Sidebar Controls ---------------- -->
+  <aside id="sidebar">
+    <div id="sidebarContent">
+
+      <!-- Accordion 1: Theme Identity -->
+      <div class="acc-item open">
+        <div class="acc-header">
+          <div class="acc-title-wrap">
+            <span class="acc-icon">&#9881;</span>
+            <span class="acc-title">Theme Information</span>
+          </div>
+          <span class="acc-chevron">&#9662;</span>
+        </div>
+        <div class="acc-body">
+          <div class="control-group">
+            <label class="control-label" for="themeNameInput">Theme Identifier</label>
+            <input type="text" id="themeNameInput" class="ctrl-input" value="cdriDatahubTheme">
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="cvdSelect">Color Vision Deficiency (Preview)</label>
+            <select id="cvdSelect" class="ctrl-select">
+              <option value="none">Normal Vision</option>
+              <option value="protanopia">Protanopia (Red-blind)</option>
+              <option value="deuteranopia">Deuteranopia (Green-blind)</option>
+              <option value="tritanopia">Tritanopia (Blue-blind)</option>
+              <option value="achromatopsia">Achromatopsia (Monochrome)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 2: Series Color Palette -->
+      <div class="acc-item open">
+        <div class="acc-header">
+          <div class="acc-title-wrap">
+            <span class="acc-icon">&#127912;</span>
+            <span class="acc-title">Series Color Palette</span>
+            <span class="acc-badge" id="paletteCountBadge">8 colors</span>
+          </div>
+          <span class="acc-chevron">&#9662;</span>
+        </div>
+        <div class="acc-body">
+          <div class="palette-grid" id="paletteGrid"></div>
+          
+          <div class="palette-actions">
+            <button class="palette-btn" id="btnAddColor">+ Add Swatch</button>
+            <button class="palette-btn" id="btnReversePalette">&#8646; Reverse</button>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="paletteQuickPreset">Palette Presets</label>
+            <select id="paletteQuickPreset" class="ctrl-select">
+              <option value="">-- Apply Quick Palette --</option>
+              <option value="datahub">CDRI Datahub Categorical (8)</option>
+              <option value="vibrant">Vibrant Tech (8)</option>
+              <option value="warm">Warm Terracotta (6)</option>
+              <option value="cool">Oceanic Cyan/Blue (6)</option>
+              <option value="forest">Natural Greens (6)</option>
+              <option value="highcontrast">High Contrast (6)</option>
+            </select>
+          </div>
+
+          <div class="contrast-card" id="wcagBadge"></div>
+        </div>
+      </div>
+
+      <!-- Accordion 3: Canvas & Global Styles -->
+      <div class="acc-item">
+        <div class="acc-header">
+          <div class="acc-title-wrap">
+            <span class="acc-icon">&#128444;</span>
+            <span class="acc-title">Canvas &amp; Typography</span>
+          </div>
+          <span class="acc-chevron">&#9662;</span>
+        </div>
+        <div class="acc-body">
+          <div class="control-group">
+            <label class="control-label">Background Color</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlBgColor" class="color-swatch-picker" value="#ffffff">
+              <input type="text" id="ctrlBgColorHex" class="ctrl-input color-hex-text" value="#ffffff">
+            </div>
+            <div style="margin-top:6px;">
+              <div class="toggle-control">
+                <label for="ctrlBgTransparent">Transparent Background</label>
+                <input type="checkbox" id="ctrlBgTransparent">
+              </div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Title Text Color</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlTitleColor" class="color-swatch-picker" value="#0B1220">
+              <input type="text" id="ctrlTitleColorHex" class="ctrl-input color-hex-text" value="#0B1220">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Subtitle Text Color</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlSubtitleColor" class="color-swatch-picker" value="#64748B">
+              <input type="text" id="ctrlSubtitleColorHex" class="ctrl-input color-hex-text" value="#64748B">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Body / Axis Text Color</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlTextColor" class="color-swatch-picker" value="#233A66">
+              <input type="text" id="ctrlTextColorHex" class="ctrl-input color-hex-text" value="#233A66">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="ctrlFontFamily">Font Family</label>
+            <select id="ctrlFontFamily" class="ctrl-select">
+              <option value="Inter, sans-serif">Inter (Datahub default)</option>
+              <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">System Sans</option>
+              <option value="'Roboto', sans-serif">Roboto</option>
+              <option value="'JetBrains Mono', monospace">Monospace</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 4: Coordinate Axes (X / Y) -->
+      <div class="acc-item">
+        <div class="acc-header">
+          <div class="acc-title-wrap">
+            <span class="acc-icon">&#9638;</span>
+            <span class="acc-title">Coordinate Axes</span>
+          </div>
+          <span class="acc-chevron">&#9662;</span>
+        </div>
+        <div class="acc-body">
+          <div class="control-group">
+            <div class="toggle-control">
+              <label for="ctrlAxisLineShow">Show Axis Line</label>
+              <input type="checkbox" id="ctrlAxisLineShow" checked>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Axis Line Color</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlAxisLineColor" class="color-swatch-picker" value="#D1D5DB">
+              <input type="text" id="ctrlAxisLineColorHex" class="ctrl-input color-hex-text" value="#D1D5DB">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="toggle-control">
+              <label for="ctrlSplitLineShow">Show Split Gridlines</label>
+              <input type="checkbox" id="ctrlSplitLineShow" checked>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Split Gridline Color</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlSplitLineColor" class="color-swatch-picker" value="#E5E7EB">
+              <input type="text" id="ctrlSplitLineColorHex" class="ctrl-input color-hex-text" value="#E5E7EB">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="ctrlSplitLineType">Gridline Style</label>
+            <select id="ctrlSplitLineType" class="ctrl-select">
+              <option value="solid">Solid</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 5: Series Visual Styling -->
+      <div class="acc-item">
+        <div class="acc-header">
+          <div class="acc-title-wrap">
+            <span class="acc-icon">&#128200;</span>
+            <span class="acc-title">Series Styling (Line, Bar, etc.)</span>
+          </div>
+          <span class="acc-chevron">&#9662;</span>
+        </div>
+        <div class="acc-body">
+          <!-- Line Options -->
+          <div class="control-group">
+            <label class="control-label" for="ctrlLineWidth">Line Stroke Width <span class="val" id="valLineWidth">2px</span></label>
+            <input type="range" id="ctrlLineWidth" class="ctrl-range" min="1" max="6" value="2">
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="ctrlSymbolSize">Line / Scatter Symbol Size <span class="val" id="valSymbolSize">6px</span></label>
+            <input type="range" id="ctrlSymbolSize" class="ctrl-range" min="0" max="14" value="6">
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="ctrlSymbolType">Symbol Marker Shape</label>
+            <select id="ctrlSymbolType" class="ctrl-select">
+              <option value="emptyCircle">Empty Circle</option>
+              <option value="circle">Solid Circle</option>
+              <option value="rect">Rectangle</option>
+              <option value="roundRect">Rounded Rect</option>
+              <option value="triangle">Triangle</option>
+              <option value="diamond">Diamond</option>
+              <option value="pin">Pin</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <div class="toggle-control">
+              <label for="ctrlLineSmooth">Smooth Line Curves</label>
+              <input type="checkbox" id="ctrlLineSmooth">
+            </div>
+          </div>
+
+          <!-- Bar Options -->
+          <div class="control-group">
+            <label class="control-label" for="ctrlBarRadius">Bar Corner Radius <span class="val" id="valBarRadius">4px</span></label>
+            <input type="range" id="ctrlBarRadius" class="ctrl-range" min="0" max="14" value="4">
+          </div>
+
+          <!-- Pie Options -->
+          <div class="control-group">
+            <label class="control-label" for="ctrlPieRadius">Pie/Donut Corner Radius <span class="val" id="valPieRadius">4px</span></label>
+            <input type="range" id="ctrlPieRadius" class="ctrl-range" min="0" max="12" value="4">
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 6: Tooltip & Legend -->
+      <div class="acc-item">
+        <div class="acc-header">
+          <div class="acc-title-wrap">
+            <span class="acc-icon">&#128172;</span>
+            <span class="acc-title">Legend &amp; Tooltip</span>
+          </div>
+          <span class="acc-chevron">&#9662;</span>
+        </div>
+        <div class="acc-body">
+          <div class="control-group">
+            <label class="control-label">Tooltip Background</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlTooltipBg" class="color-swatch-picker" value="#0F172A">
+              <input type="text" id="ctrlTooltipBgHex" class="ctrl-input color-hex-text" value="#0F172A">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label">Tooltip Text Color</label>
+            <div class="color-picker-row">
+              <input type="color" id="ctrlTooltipText" class="color-swatch-picker" value="#F8FAFC">
+              <input type="text" id="ctrlTooltipTextHex" class="ctrl-input color-hex-text" value="#F8FAFC">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="ctrlTooltipBorderRadius">Tooltip Corner Radius <span class="val" id="valTooltipRadius">6px</span></label>
+            <input type="range" id="ctrlTooltipBorderRadius" class="ctrl-range" min="0" max="12" value="6">
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion 7: Data Source & Upload -->
+      <div class="acc-item">
+        <div class="acc-header">
+          <div class="acc-title-wrap">
+            <span class="acc-icon">&#128193;</span>
+            <span class="acc-title">Data Source (Upload / Custom)</span>
+          </div>
+          <span class="acc-chevron">&#9662;</span>
+        </div>
+        <div class="acc-body">
+          <div class="control-group">
+            <div class="view-mode-toggle" style="width:100%;">
+              <button class="view-mode-btn active" id="btnSourceSample" style="flex:1;">Sample Metrics</button>
+              <button class="view-mode-btn" id="btnSourceUpload" style="flex:1;">Custom File</button>
+            </div>
+          </div>
+          <div id="sidebarUploadArea" style="display:none;margin-top:10px;">
+            <button class="palette-btn" id="btnTriggerUpload" style="width:100%;padding:8px;">Choose CSV / JSON File</button>
+            <input type="file" id="customFileInput" accept=".csv,.json,text/csv,application/json" style="display:none">
+            <div id="sidebarUploadFileLabel" style="font-size:11px;color:var(--muted);margin-top:6px;word-break:break-all;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ---------------- Main Preview Workspace ---------------- -->
+  <main id="main">
+    <!-- Main Toolbar -->
+    <div id="mainToolbar">
+      <div class="view-heading">
+        <h2 id="viewHeadingTitle">Theme Preview Dashboard</h2>
+        <span class="meta" id="viewHeadingMeta">Synchronized live preview across 9 core chart families</span>
+      </div>
+
+      <div class="canvas-tools">
+        <button class="canvas-mode-btn" id="btnToggleCanvasBg" title="Toggle between light and dark canvas background">
+          <span id="canvasBgIcon">&#9789;</span>
+          <span id="canvasBgText">Dark Canvas</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Workspace Stage -->
+    <div id="canvasStage">
+
+      <!-- View 1: 9-Chart Dashboard Grid -->
+      <div id="dashboardGrid">
+        <!-- 1: Multi-series Line Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#128200; Line &amp; Trend Chart</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('line')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartLine" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 2: Stacked Bar Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#128202; Stacked Bar Chart</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('stackedBar')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartBar" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 3: Doughnut Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#128392; Doughnut / Composition</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('doughnut')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartPie" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 4: Scatter / Bubble Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#10022; Scatter &amp; Bubble</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('bubble')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartScatter" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 5: Radar Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#127919; Multi-axis Radar</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('radar')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartRadar" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 6: Heatmap Matrix -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#128308; Sector Activity Heatmap</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('heatmap')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartHeatmap" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 7: Candlestick (K-Line) -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#128203; Candlestick (K-Line)</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('candlestick')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartCandlestick" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 8: Gauge KPI -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#9201; Metric Gauge</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('gauge')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartGauge" class="grid-chart-canvas"></div></div>
+        </div>
+
+        <!-- 9: Flow Sankey -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">&#128256; Flow Sankey</div>
+            <button class="chart-focus-btn" onclick="openFocusMode('sankey')">&#9974; Focus</button>
+          </div>
+          <div class="chart-card-body"><div id="gridChartSankey" class="grid-chart-canvas"></div></div>
+        </div>
+      </div>
+
+      <!-- View 2: Focused Single Chart View -->
+      <div id="focusView">
+        <div class="focus-controls-bar">
+          <div class="focus-select-wrap">
+            <label for="focusChartTypeSelect">Inspect Chart Type:</label>
+            <select id="focusChartTypeSelect">
+              <optgroup label="Line &amp; Area">
+                <option value="line">Line Chart</option>
+                <option value="lineSmooth">Smooth Line Chart</option>
+                <option value="area">Area Chart</option>
+                <option value="stackedArea">Stacked Area Chart</option>
+              </optgroup>
+              <optgroup label="Bar Charts">
+                <option value="bar">Standard Bar</option>
+                <option value="stackedBar">Stacked Bar</option>
+                <option value="horizontalBar">Horizontal Bar</option>
+              </optgroup>
+              <optgroup label="Distribution &amp; Scatter">
+                <option value="scatter">Scatter Plot</option>
+                <option value="bubble">Bubble Chart</option>
+                <option value="heatmap">Heatmap</option>
+                <option value="boxplot">Boxplot</option>
+              </optgroup>
+              <optgroup label="Part-to-Whole">
+                <option value="pie">Pie Chart</option>
+                <option value="doughnut">Doughnut Chart</option>
+                <option value="funnel">Funnel Chart</option>
+                <option value="treemap">Treemap</option>
+              </optgroup>
+              <optgroup label="Flow &amp; Geo">
+                <option value="sankey">Sankey Diagram</option>
+                <option value="map">World Map</option>
+              </optgroup>
+              <optgroup label="KPI &amp; Specialized">
+                <option value="radar">Radar Chart</option>
+                <option value="gauge">Gauge Indicator</option>
+                <option value="candlestick">Candlestick (K-Line)</option>
+                <option value="graph">Network Graph</option>
+              </optgroup>
+            </select>
+          </div>
+          <button class="top-btn" onclick="switchViewMode('dashboard')">&#8592; Back to Dashboard</button>
+        </div>
+
+        <!-- Upload Information & Column Mapping Container -->
+        <div id="uploadPanel">
+          <div id="uploadSummary"></div>
+          <div id="uploadPreviewWrap"><table id="uploadPreviewTable"></table></div>
+          <div id="mappingArea" style="margin-top:12px;"></div>
+          <div id="uploadMsg" style="margin-top:8px;font-size:12px;"></div>
+        </div>
+
+        <div class="focus-card">
+          <div id="focusChart"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ---------------- Code & Export Modal ---------------- -->
+<dialog id="exportModal">
+  <div class="modal-header">
+    <div class="modal-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export ECharts Theme
+    </div>
+    <button class="modal-close-btn" id="btnCloseExportModal">&times;</button>
+  </div>
+
+  <div class="modal-tabs">
+    <button class="modal-tab-btn active" data-tab="builderJson">Theme Builder JSON</button>
+    <button class="modal-tab-btn" data-tab="nativeJson">Native Theme JSON</button>
+    <button class="modal-tab-btn" data-tab="jsSnippet">JavaScript / ESM Snippet</button>
+  </div>
+
+  <div class="modal-body">
+    <div class="code-viewer" id="modalCodeViewer"></div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="top-btn" id="btnCopyModalCode">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copy to Clipboard
+    </button>
+    <div class="modal-actions">
+      <button class="top-btn primary" id="btnDownloadJson">Download .json</button>
+      <button class="top-btn primary" id="btnDownloadJs">Download .js</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Toast -->
+<div id="toast">
+  <span id="toastIcon">&#10003;</span>
+  <span id="toastMsg">Action completed!</span>
+</div>
+
+<!-- ---------------- Application Logic ---------------- -->
+<script>
+/* ==================================================================
+   1. Brand Defaults & Theme Presets
+   ================================================================== */
+const FONT_FAMILY = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+const PRESETS = {
+  cdriLight: {
+    name: "cdriDatahubTheme",
+    palette: ["#14A0B8", "#4994DF", "#4C41C8", "#8F3D8F", "#DA2F54", "#F59847", "#BD910F", "#485922"],
+    backgroundColor: "#ffffff",
+    titleColor: "#0B1220",
+    subtitleColor: "#64748B",
+    textColor: "#233A66",
+    axisLineColor: "#D1D5DB",
+    splitLineColor: "#E5E7EB",
+    splitLineType: "solid",
+    lineWidth: 2,
+    symbolSize: 6,
+    symbolType: "emptyCircle",
+    lineSmooth: false,
+    barRadius: 4,
+    pieRadius: 4,
+    tooltipBg: "#0F172A",
+    tooltipText: "#F8FAFC",
+    tooltipRadius: 6,
+    canvasDark: false
+  },
+  cdriDark: {
+    name: "cdriDatahubDarkTheme",
+    palette: ["#06B6D4", "#38BDF8", "#818CF8", "#C084FC", "#F43F5E", "#FB923C", "#FBBF24", "#A3E635"],
+    backgroundColor: "#0B1220",
+    titleColor: "#F8FAFC",
+    subtitleColor: "#94A3B8",
+    textColor: "#94A3B8",
+    axisLineColor: "#334155",
+    splitLineColor: "#1E293B",
+    splitLineType: "solid",
+    lineWidth: 2,
+    symbolSize: 6,
+    symbolType: "emptyCircle",
+    lineSmooth: false,
+    barRadius: 4,
+    pieRadius: 4,
+    tooltipBg: "#1E293B",
+    tooltipText: "#F8FAFC",
+    tooltipRadius: 6,
+    canvasDark: true
+  },
+  vintage: {
+    name: "vintageTheme",
+    palette: ["#d87c7c", "#919e8b", "#d7ab82", "#6e7074", "#61a0a8", "#efa18d", "#787464", "#cc7e63"],
+    backgroundColor: "#fef8ef",
+    titleColor: "#333333",
+    subtitleColor: "#777777",
+    textColor: "#333333",
+    axisLineColor: "#cccccc",
+    splitLineColor: "#e0d9cd",
+    splitLineType: "dashed",
+    lineWidth: 2,
+    symbolSize: 6,
+    symbolType: "circle",
+    lineSmooth: true,
+    barRadius: 0,
+    pieRadius: 0,
+    tooltipBg: "rgba(50,50,50,0.85)",
+    tooltipText: "#ffffff",
+    tooltipRadius: 4,
+    canvasDark: false
+  },
+  macarons: {
+    name: "macaronsTheme",
+    palette: ["#2ec7c9", "#b6a2de", "#5ab1ef", "#ffb980", "#d87a80", "#8d98b3", "#e5cf0d", "#97b552"],
+    backgroundColor: "#ffffff",
+    titleColor: "#008acd",
+    subtitleColor: "#888888",
+    textColor: "#2ec7c9",
+    axisLineColor: "#008acd",
+    splitLineColor: "#eeeeee",
+    splitLineType: "dotted",
+    lineWidth: 2.5,
+    symbolSize: 6,
+    symbolType: "emptyCircle",
+    lineSmooth: true,
+    barRadius: 6,
+    pieRadius: 4,
+    tooltipBg: "rgba(50,50,50,0.8)",
+    tooltipText: "#ffffff",
+    tooltipRadius: 6,
+    canvasDark: false
+  },
+  shine: {
+    name: "shineTheme",
+    palette: ["#c12e34", "#e6b600", "#0098d9", "#2b821d", "#005eaa", "#339ca8", "#cda514", "#29a27f"],
+    backgroundColor: "#ffffff",
+    titleColor: "#333333",
+    subtitleColor: "#666666",
+    textColor: "#333333",
+    axisLineColor: "#1e53a0",
+    splitLineColor: "#e6e6e6",
+    splitLineType: "solid",
+    lineWidth: 2,
+    symbolSize: 7,
+    symbolType: "diamond",
+    lineSmooth: false,
+    barRadius: 0,
+    pieRadius: 0,
+    tooltipBg: "rgba(0,0,0,0.75)",
+    tooltipText: "#ffffff",
+    tooltipRadius: 4,
+    canvasDark: false
+  },
+  infographic: {
+    name: "infographicTheme",
+    palette: ["#c1232b", "#27727b", "#fcce10", "#e87c25", "#b5c334", "#fe8463", "#9bca63", "#fad860"],
+    backgroundColor: "#ffffff",
+    titleColor: "#27727b",
+    subtitleColor: "#666666",
+    textColor: "#333333",
+    axisLineColor: "#27727b",
+    splitLineColor: "#f0f0f0",
+    splitLineType: "dashed",
+    lineWidth: 2,
+    symbolSize: 6,
+    symbolType: "roundRect",
+    lineSmooth: false,
+    barRadius: 4,
+    pieRadius: 2,
+    tooltipBg: "rgba(50,50,50,0.85)",
+    tooltipText: "#ffffff",
+    tooltipRadius: 4,
+    canvasDark: false
+  },
+  roma: {
+    name: "romaTheme",
+    palette: ["#e01f54", "#001852", "#f5e8c8", "#b8d2c7", "#c6b38e", "#a4d8c2", "#f3d999", "#d3758f"],
+    backgroundColor: "#ffffff",
+    titleColor: "#e01f54",
+    subtitleColor: "#001852",
+    textColor: "#333333",
+    axisLineColor: "#cccccc",
+    splitLineColor: "#eeeeee",
+    splitLineType: "solid",
+    lineWidth: 2,
+    symbolSize: 6,
+    symbolType: "circle",
+    lineSmooth: false,
+    barRadius: 0,
+    pieRadius: 0,
+    tooltipBg: "rgba(50,50,50,0.8)",
+    tooltipText: "#ffffff",
+    tooltipRadius: 4,
+    canvasDark: false
+  },
+  cyberDark: {
+    name: "cyberDarkTheme",
+    palette: ["#00F0FF", "#7000FF", "#FF007A", "#00FF66", "#FFE600", "#FF6B00", "#9D00FF", "#00B2FF"],
+    backgroundColor: "#0F172A",
+    titleColor: "#00F0FF",
+    subtitleColor: "#94A3B8",
+    textColor: "#CBD5E1",
+    axisLineColor: "#334155",
+    splitLineColor: "#1E293B",
+    splitLineType: "dashed",
+    lineWidth: 3,
+    symbolSize: 7,
+    symbolType: "diamond",
+    lineSmooth: true,
+    barRadius: 6,
+    pieRadius: 6,
+    tooltipBg: "#1E293B",
+    tooltipText: "#00F0FF",
+    tooltipRadius: 8,
+    canvasDark: true
+  }
+};
+
+/* Active Theme State */
+const state = {
+  ...JSON.parse(JSON.stringify(PRESETS.cdriLight)),
+  bgTransparent: false,
+  axisLineShow: true,
+  splitLineShow: true,
+  fontFamily: FONT_FAMILY,
+  viewMode: "dashboard", // "dashboard" | "focus"
+  focusChartType: "line",
+  dataSource: "sample"    // "sample" | "upload"
+};
+
+/* ==================================================================
+   2. Theme Builder Object Construction
+   ================================================================== */
+function buildTheme(){
+  const bgColor = state.bgTransparent ? "rgba(0,0,0,0)" : state.backgroundColor;
+  const isDark = isDarkHex(state.backgroundColor);
+
+  return {
+    color: state.palette,
+    backgroundColor: bgColor,
+    textStyle: { fontFamily: state.fontFamily, color: state.textColor },
+    title: {
+      textStyle: { color: state.titleColor, fontFamily: state.fontFamily, fontWeight: 700 },
+      subtextStyle: { color: state.subtitleColor, fontFamily: state.fontFamily }
+    },
+    legend: {
+      textStyle: { color: state.textColor, fontFamily: state.fontFamily }
+    },
+    tooltip: {
+      backgroundColor: state.tooltipBg,
+      borderColor: state.palette[0] || "#06B6D4",
+      borderWidth: 1,
+      borderRadius: state.tooltipRadius,
+      textStyle: { color: state.tooltipText, fontFamily: state.fontFamily }
+    },
+    categoryAxis: {
+      axisLine: { show: state.axisLineShow, lineStyle: { color: state.axisLineColor } },
+      axisTick: { show: state.axisLineShow, lineStyle: { color: state.axisLineColor } },
+      axisLabel: { color: state.textColor, fontFamily: state.fontFamily },
+      splitLine: { show: state.splitLineShow, lineStyle: { color: [state.splitLineColor], type: state.splitLineType } }
+    },
+    valueAxis: {
+      axisLine: { show: state.axisLineShow, lineStyle: { color: state.axisLineColor } },
+      axisTick: { show: state.axisLineShow, lineStyle: { color: state.axisLineColor } },
+      axisLabel: { color: state.textColor, fontFamily: state.fontFamily },
+      splitLine: { show: state.splitLineShow, lineStyle: { color: [state.splitLineColor], type: state.splitLineType } }
+    },
+    line: {
+      itemStyle: { borderWidth: 1.5 },
+      lineStyle: { width: state.lineWidth },
+      symbolSize: state.symbolSize,
+      symbol: state.symbolType,
+      smooth: state.lineSmooth
+    },
+    bar: {
+      itemStyle: {
+        borderRadius: [state.barRadius, state.barRadius, 0, 0]
+      }
+    },
+    pie: {
+      itemStyle: {
+        borderRadius: state.pieRadius,
+        borderColor: bgColor,
+        borderWidth: state.pieRadius > 0 ? 2 : 0
+      }
+    },
+    radar: {
+      lineStyle: { width: state.lineWidth },
+      symbolSize: state.symbolSize,
+      symbol: state.symbolType
+    },
+    graph: {
+      color: state.palette,
+      lineStyle: { color: state.axisLineColor, curveness: 0.2 }
+    }
+  };
+}
+
+/* Official ECharts Theme Builder JSON Schema Output */
+function toThemeBuilderJSON(){
+  return {
+    version: 1,
+    themeName: state.name || "cdriDatahubTheme",
+    theme: {
+      seriesCnt: state.palette.length,
+      backgroundColor: state.bgTransparent ? "rgba(0,0,0,0)" : state.backgroundColor,
+      titleColor: state.titleColor,
+      subtitleColor: state.subtitleColor,
+      textColorShow: false,
+      textColor: state.textColor,
+      markTextColor: "#ffffff",
+      color: state.palette,
+      borderColor: state.axisLineColor,
+      borderWidth: 0,
+      visualMapColor: [state.palette[0] || "#06B6D4", "#B7D4FB"],
+      legendTextColor: state.textColor,
+      kColor: state.palette[3] || "#8F3D8F",
+      kColor0: state.palette[1] || "#4994DF",
+      kBorderColor: state.palette[3] || "#8F3D8F",
+      kBorderColor0: state.palette[1] || "#4994DF",
+      kBorderWidth: 1,
+      lineWidth: state.lineWidth,
+      symbolSize: state.symbolSize,
+      symbol: state.symbolType,
+      symbolBorderWidth: 1.5,
+      lineSmooth: state.lineSmooth,
+      graphLineWidth: 1,
+      graphLineColor: state.axisLineColor,
+      mapLabelColor: state.titleColor,
+      mapLabelColorE: state.palette[0] || "#06B6D4",
+      mapBorderColor: "#cccccc",
+      mapBorderColorE: state.palette[0] || "#06B6D4",
+      mapBorderWidth: 0.5,
+      mapBorderWidthE: 1,
+      mapAreaColor: "#eeeeee",
+      mapAreaColorE: "rgba(6,182,212,0.25)",
+      axes: [
+        { type:"all", name:"通用坐标轴", axisLineShow:state.axisLineShow, axisLineColor:state.axisLineColor, axisTickShow:false, axisTickColor:"#333", axisLabelShow:true, axisLabelColor:state.textColor, splitLineShow:state.splitLineShow, splitLineColor:[state.splitLineColor] },
+        { type:"category", name:"类目坐标轴", axisLineShow:state.axisLineShow, axisLineColor:state.axisLineColor, axisTickShow:true, axisTickColor:"#333", axisLabelShow:true, axisLabelColor:state.textColor, splitLineShow:false, splitLineColor:[state.splitLineColor] },
+        { type:"value", name:"数值坐标轴", axisLineShow:state.axisLineShow, axisLineColor:state.axisLineColor, axisTickShow:true, axisTickColor:"#333", axisLabelShow:true, axisLabelColor:state.textColor, splitLineShow:state.splitLineShow, splitLineColor:[state.splitLineColor] }
+      ],
+      axisSeparateSetting: false,
+      toolboxColor: "#999999",
+      toolboxEmphasisColor: state.palette[0] || "#06B6D4",
+      tooltipAxisColor: state.axisLineColor,
+      tooltipAxisWidth: 1,
+      datazoomBackgroundColor: "rgba(255,255,255,0)",
+      datazoomDataColor: "rgba(6,182,212,0.35)",
+      datazoomFillColor: "rgba(6,182,212,0.15)",
+      datazoomHandleColor: state.palette[0] || "#06B6D4",
+      datazoomHandleWidth: "100%",
+      datazoomLabelColor: state.textColor
+    }
+  };
+}
+
+/* ==================================================================
+   3. Contrast & Accessibility Helper
+   ================================================================== */
+function hexToRgb(hex){
+  const h = hex.replace("#","");
+  const v = h.length === 3 ? h.split("").map(c=>c+c).join("") : h;
+  const num = parseInt(v, 16);
+  return [(num>>16)&255, (num>>8)&255, num&255];
+}
+function relLuminance(rgb){
+  const chan = c => { c/=255; return c<=0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+  return 0.2126*chan(rgb[0]) + 0.7152*chan(rgb[1]) + 0.0722*chan(rgb[2]);
+}
+function contrastRatio(hex1, hex2){
+  const l1 = relLuminance(hexToRgb(hex1));
+  const l2 = relLuminance(hexToRgb(hex2));
+  const lighter = Math.max(l1,l2), darker = Math.min(l1,l2);
+  return (lighter+0.05)/(darker+0.05);
+}
+function isDarkHex(hex){
+  if (!hex || !/^#/.test(hex)) return false;
+  return relLuminance(hexToRgb(hex)) < 0.2;
+}
+
+function updateWCAGAnalysis(){
+  const baseBg = state.bgTransparent ? "#ffffff" : state.backgroundColor;
+  let failCount = 0;
+  const badges = document.querySelectorAll(".swatch-wcag-badge");
+  state.palette.forEach((hex, i) => {
+    const ratio = contrastRatio(hex, baseBg);
+    const fails = ratio < 3.0;
+    if (fails) failCount++;
+    if (badges[i]){
+      badges[i].style.display = fails ? "flex" : "none";
+      badges[i].title = `${ratio.toFixed(2)}:1 contrast against background (WCAG AA graphical min: 3:1)`;
+    }
+  });
+
+  const card = document.getElementById("wcagBadge");
+  if (failCount === 0){
+    card.className = "contrast-card ok";
+    card.innerHTML = `✓ All ${state.palette.length} colors pass WCAG AA contrast (&ge;3:1)`;
+  } else {
+    card.className = "contrast-card warn";
+    card.innerHTML = `⚠ ${failCount} of ${state.palette.length} colors fall below 3:1 contrast against canvas`;
+  }
+}
+
+/* ==================================================================
+   4. Realistic CDRI Datahub Indicators & Sample Data
+   ================================================================== */
+const SECTORS = ["Education","Agriculture","Health","Economy","Governance","Environment","Infrastructure","Social Protection"];
+const QUARTERS = ["2023 Q3","2023 Q4","2024 Q1","2024 Q2","2024 Q3","2024 Q4"];
+
+function cloneDeep(o){ return JSON.parse(JSON.stringify(o)); }
+function jitter(v){ return Math.max(1, Math.round(v * (0.75 + Math.random()*0.5))); }
+
+const TREEMAP_BASE = [
+  { name: "Education", value: 126, children: [{ name: "Primary", value: 70 }, { name: "Secondary", value: 34 }, { name: "Tertiary", value: 22 }] },
+  { name: "Health", value: 88, children: [{ name: "Public Health", value: 58 }, { name: "Clinical", value: 30 }] },
+  { name: "Agriculture", value: 94 },
+  { name: "Economy", value: 71 },
+  { name: "Governance", value: 65 },
+  { name: "Environment", value: 58 },
+  { name: "Infrastructure", value: 52 },
+  { name: "Social Protection", value: 47 }
+];
+
+const BOXPLOT_BASE = [
+  [8, 12, 15, 19, 26],
+  [10, 14, 18, 23, 30],
+  [6, 9, 12, 15, 20],
+  [9, 13, 17, 21, 28],
+  [11, 15, 19, 24, 32],
+  [7, 10, 13, 17, 22],
+  [12, 16, 21, 27, 35],
+  [9, 12, 16, 20, 26]
+];
+
+const MAP_BASE = {
+  "Cambodia": 180, "China": 45, "Japan": 52, "United States": 38, "France": 30,
+  "Australia": 26, "Korea": 22, "Germany": 24, "Vietnam": 18, "Thailand": 20, "United Kingdom": 16
+};
+
+const WORLD_MAP_URL = "https://cdn.jsdelivr.net/gh/apache/echarts@5.5.0/test/data/map/json/world.json";
+let worldMapStatus = "loading";
+fetch(WORLD_MAP_URL)
+  .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then(geo => {
+    echarts.registerMap("world", geo);
+    worldMapStatus = "ready";
+    if (state.viewMode === "focus" && state.focusChartType === "map") renderFocusChart();
+  })
+  .catch(() => {
+    worldMapStatus = "error";
+    if (state.viewMode === "focus" && state.focusChartType === "map") renderFocusChart();
+  });
+
+const SAMPLE_BASE = {
+  trend: {
+    categories: [...QUARTERS],
+    seriesNames: ["Education", "Health", "Agriculture", "Economy"],
+    seriesData: [
+      [42, 48, 55, 63, 71, 80],
+      [30, 34, 37, 41, 46, 50],
+      [58, 55, 60, 57, 62, 66],
+      [24, 28, 35, 39, 44, 49]
+    ]
+  },
+  stackedBar: {
+    categories: [...SECTORS],
+    seriesNames: ["Government Funded", "Donor Funded"],
+    seriesData: [
+      [70, 50, 60, 40, 45, 30, 35, 28],
+      [56, 44, 28, 31, 20, 28, 17, 19]
+    ]
+  },
+  pie: {
+    categories: [...SECTORS],
+    seriesNames: ["Datasets Published"],
+    seriesData: [[126, 94, 88, 71, 65, 58, 52, 47]]
+  },
+  radar: {
+    categories: [...SECTORS],
+    seriesNames: ["2023 Coverage", "2024 Coverage"],
+    seriesData: [
+      [55, 60, 48, 62, 40, 45, 50, 38],
+      [72, 74, 60, 78, 55, 58, 66, 50]
+    ]
+  },
+  sankey: {
+    nodes: ["Government", "Donors", "Surveys", "Education", "Health", "Agriculture", "Economy", "Published", "Review"].map(name=>({name})),
+    links: [
+      { source: "Government", target: "Education", value: 40 },
+      { source: "Government", target: "Health", value: 30 },
+      { source: "Government", target: "Agriculture", value: 25 },
+      { source: "Donors", target: "Education", value: 35 },
+      { source: "Donors", target: "Health", value: 28 },
+      { source: "Donors", target: "Economy", value: 20 },
+      { source: "Surveys", target: "Agriculture", value: 22 },
+      { source: "Surveys", target: "Economy", value: 18 },
+      { source: "Education", target: "Published", value: 60 },
+      { source: "Education", target: "Review", value: 15 },
+      { source: "Health", target: "Published", value: 45 },
+      { source: "Health", target: "Review", value: 13 },
+      { source: "Agriculture", target: "Published", value: 38 },
+      { source: "Agriculture", target: "Review", value: 9 },
+      { source: "Economy", target: "Published", value: 30 },
+      { source: "Economy", target: "Review", value: 8 }
+    ]
+  },
+  bubble: {
+    points: SECTORS.map((name, i) => ({
+      name,
+      x: [420, 260, 340, 190, 150, 130, 175, 110][i],
+      y: [85, 60, 70, 40, 35, 30, 38, 45][i],
+      size: [126, 94, 88, 71, 65, 58, 52, 47][i]
+    }))
+  },
+  heatmap: (() => {
+    const d = [];
+    SECTORS.forEach((s, si) => QUARTERS.forEach((q, qi) => d.push([si, qi, Math.round(Math.random()*12)])));
+    return d;
+  })(),
+  candlestick: (() => {
+    const days = Array.from({length: 12}, (_, i) => "W" + (i+1));
+    const vals = days.map(() => {
+      const o = 80 + Math.random()*30, c = o + (Math.random()-0.5)*20;
+      const l = Math.min(o,c) - Math.random()*10, h = Math.max(o,c) + Math.random()*10;
+      return [Math.round(o), Math.round(c), Math.round(l), Math.round(h)];
+    });
+    return { days, vals };
+  })(),
+  gauge: 78,
+  treemap: cloneDeep(TREEMAP_BASE),
+  boxplot: cloneDeep(BOXPLOT_BASE),
+  map: cloneDeep(MAP_BASE)
+};
+
+let workingData = cloneDeep(SAMPLE_BASE);
+
+function randomizeData(){
+  workingData.trend.seriesData = workingData.trend.seriesData.map(arr => arr.map(jitter));
+  workingData.stackedBar.seriesData = workingData.stackedBar.seriesData.map(arr => arr.map(jitter));
+  workingData.pie.seriesData[0] = workingData.pie.seriesData[0].map(jitter);
+  workingData.radar.seriesData = workingData.radar.seriesData.map(arr => arr.map(v => Math.min(100, jitter(v))));
+  workingData.sankey.links = workingData.sankey.links.map(l => ({ ...l, value: jitter(l.value) }));
+  workingData.bubble.points = workingData.bubble.points.map(p => ({ ...p, x: jitter(p.x), y: jitter(p.y), size: jitter(p.size) }));
+  workingData.gauge = Math.round(50 + Math.random()*45);
+  renderAll();
+  showToast("Sample data randomized! 🎲");
+}
+
+/* ==================================================================
+   5. Chart Option Generators
+   ================================================================== */
+function getLineOption(){
+  const d = workingData.trend;
+  return {
+    title: { text: "Datasets Over Time", left: "left", textStyle: { fontSize: 13 } },
+    tooltip: { trigger: "axis" },
+    legend: { bottom: 0, icon: "circle", itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 11 } },
+    grid: { left: 35, right: 15, top: 40, bottom: 35 },
+    xAxis: { type: "category", data: d.categories, boundaryGap: false },
+    yAxis: { type: "value" },
+    series: d.seriesNames.map((name, i) => ({
+      name,
+      type: "line",
+      data: d.seriesData[i],
+      smooth: state.lineSmooth
+    }))
+  };
+}
+
+function getStackedBarOption(){
+  const d = workingData.stackedBar;
+  return {
+    title: { text: "Funding Source Distribution", left: "left", textStyle: { fontSize: 13 } },
+    tooltip: { trigger: "axis" },
+    legend: { bottom: 0, icon: "rect", itemWidth: 10, itemHeight: 10, textStyle: { fontSize: 11 } },
+    grid: { left: 35, right: 15, top: 40, bottom: 55 },
+    xAxis: { type: "category", data: d.categories, axisLabel: { interval: 0, rotate: 30, fontSize: 10 } },
+    yAxis: { type: "value" },
+    series: d.seriesNames.map((name, i) => ({
+      name,
+      type: "bar",
+      stack: "total",
+      data: d.seriesData[i],
+      itemStyle: { borderRadius: i === 1 ? [state.barRadius, state.barRadius, 0, 0] : 0 }
+    }))
+  };
+}
+
+function getPieOption(){
+  const d = workingData.pie;
+  return {
+    title: { text: "Sector Share", left: "center", textStyle: { fontSize: 13 } },
+    tooltip: { trigger: "item" },
+    legend: { show: false },
+    series: [{
+      type: "pie",
+      radius: ["40%", "70%"],
+      center: ["50%", "52%"],
+      avoidLabelOverlap: true,
+      data: d.categories.map((name, i) => ({ name, value: d.seriesData[0][i] })),
+      label: { show: false }
+    }]
+  };
+}
+
+function getScatterOption(){
+  const d = workingData.bubble;
+  const maxSize = Math.max(...d.points.map(p => p.size), 1);
+  return {
+    title: { text: "Budget vs. Beneficiaries", left: "left", textStyle: { fontSize: 13 } },
+    tooltip: { formatter: p => `${p.data.name}: ($${p.data.value[0]}k, ${p.data.value[1]}k beneficiaries)` },
+    grid: { left: 35, right: 20, top: 40, bottom: 30 },
+    xAxis: { type: "value", splitLine: { show: true } },
+    yAxis: { type: "value" },
+    series: [{
+      type: "scatter",
+      data: d.points.map(p => ({ name: p.name, value: [p.x, p.y, p.size] })),
+      symbolSize: val => 10 + (val[2]/maxSize)*28,
+      itemStyle: { opacity: 0.8 }
+    }]
+  };
+}
+
+function getRadarOption(){
+  const d = workingData.radar;
+  return {
+    title: { text: "Sector Completeness", left: "center", textStyle: { fontSize: 13 } },
+    tooltip: {},
+    legend: { bottom: 0, itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 10 } },
+    radar: {
+      radius: "60%",
+      indicator: d.categories.map(name => ({ name, max: 100 })),
+      splitArea: { show: false }
+    },
+    series: [{
+      type: "radar",
+      data: d.seriesNames.map((name, i) => ({ name, value: d.seriesData[i] }))
+    }]
+  };
+}
+
+function getHeatmapOption(){
+  return {
+    title: { text: "Project Activity Intensity", left: "left", textStyle: { fontSize: 13 } },
+    tooltip: { position: "top" },
+    grid: { left: 35, right: 15, top: 40, bottom: 50 },
+    xAxis: { type: "category", data: SECTORS, axisLabel: { interval: 0, rotate: 35, fontSize: 9 } },
+    yAxis: { type: "category", data: QUARTERS, axisLabel: { fontSize: 9 } },
+    visualMap: {
+      min: 0, max: 12, calculable: false, orient: "horizontal", left: "center", bottom: 0,
+      itemWidth: 10, itemHeight: 80,
+      inRange: { color: [state.backgroundColor, state.palette[0] || "#06B6D4", state.palette[2] || "#4C41C8"] },
+      textStyle: { fontSize: 9, color: state.textColor }
+    },
+    series: [{ type: "heatmap", data: workingData.heatmap, label: { show: false } }]
+  };
+}
+
+function getCandlestickOption(){
+  const d = workingData.candlestick;
+  return {
+    title: { text: "API Turnaround Latency (ms)", left: "left", textStyle: { fontSize: 13 } },
+    tooltip: { trigger: "axis" },
+    grid: { left: 40, right: 15, top: 40, bottom: 30 },
+    xAxis: { type: "category", data: d.days, axisLabel: { fontSize: 10 } },
+    yAxis: { type: "value", scale: true },
+    series: [{
+      type: "candlestick",
+      data: d.vals,
+      itemStyle: {
+        color: state.palette[3] || "#8F3D8F",
+        color0: state.palette[1] || "#4994DF",
+        borderColor: state.palette[3] || "#8F3D8F",
+        borderColor0: state.palette[1] || "#4994DF"
+      }
+    }]
+  };
+}
+
+function getGaugeOption(){
+  return {
+    title: { text: "Platform Health Index", left: "center", textStyle: { fontSize: 13 } },
+    series: [{
+      type: "gauge",
+      center: ["50%", "58%"],
+      radius: "80%",
+      startAngle: 200, endAngle: -20,
+      min: 0, max: 100,
+      progress: { show: true, width: 14, itemStyle: { color: state.palette[0] || "#06B6D4" } },
+      axisLine: { lineStyle: { width: 14, color: [[1, isDarkHex(state.backgroundColor) ? "#1E293B" : "#E2E8F0"]] } },
+      pointer: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: { show: false },
+      detail: {
+        valueAnimation: true, fontSize: 26, offsetCenter: [0, 0],
+        color: state.textColor, fontFamily: state.fontFamily,
+        formatter: "{value}%"
+      },
+      data: [{ value: workingData.gauge }]
+    }]
+  };
+}
+
+function getSankeyOption(){
+  const d = workingData.sankey;
+  return {
+    title: { text: "Data Publishing Pipeline", left: "left", textStyle: { fontSize: 13 } },
+    tooltip: { trigger: "item" },
+    series: [{
+      type: "sankey",
+      top: 35, bottom: 20, left: 15, right: 15,
+      emphasis: { focus: "adjacency" },
+      data: d.nodes,
+      links: d.links,
+      lineStyle: { color: "gradient", curveness: 0.5 },
+      label: { color: state.textColor, fontSize: 10 }
+    }]
+  };
+}
+
+/* ==================================================================
+   6. Chart Instances Management
+   ================================================================== */
+const chartInstances = {
+  line: null,
+  bar: null,
+  pie: null,
+  scatter: null,
+  radar: null,
+  heatmap: null,
+  candlestick: null,
+  gauge: null,
+  sankey: null,
+  focus: null
+};
+
+function initDashboardCharts(){
+  echarts.registerTheme(state.name, buildTheme());
+
+  const binds = [
+    { key: "line", id: "gridChartLine", opt: getLineOption },
+    { key: "bar", id: "gridChartBar", opt: getStackedBarOption },
+    { key: "pie", id: "gridChartPie", opt: getPieOption },
+    { key: "scatter", id: "gridChartScatter", opt: getScatterOption },
+    { key: "radar", id: "gridChartRadar", opt: getRadarOption },
+    { key: "heatmap", id: "gridChartHeatmap", opt: getHeatmapOption },
+    { key: "candlestick", id: "gridChartCandlestick", opt: getCandlestickOption },
+    { key: "gauge", id: "gridChartGauge", opt: getGaugeOption },
+    { key: "sankey", id: "gridChartSankey", opt: getSankeyOption }
+  ];
+
+  binds.forEach(b => {
+    const el = document.getElementById(b.id);
+    if (!el) return;
+    if (chartInstances[b.key]) chartInstances[b.key].dispose();
+    chartInstances[b.key] = echarts.init(el, state.name);
+    chartInstances[b.key].setOption(b.opt());
+  });
+}
+
+function getMappedUploadDataset(type){
+  const { headers, rows, mapping } = uploadState;
+  if (!headers.length || !rows.length) return null;
+
+  if (type === "scatter" || type === "bubble"){
+    if (mapping.x == null || mapping.y == null) return null;
+    const points = rows.map((r, i) => {
+      const x = Number(r[mapping.x]), y = Number(r[mapping.y]);
+      const size = mapping.size != null ? Number(r[mapping.size]) : 15;
+      if (!isFinite(x) || !isFinite(y)) return null;
+      return { name: r[mapping.category] || `Item ${i+1}`, x, y, size: isFinite(size) ? size : 15 };
+    }).filter(Boolean);
+    return { points };
+  }
+
+  if (type === "sankey"){
+    if (mapping.source == null || mapping.target == null || mapping.value == null) return null;
+    const nodeNames = [];
+    const links = [];
+    rows.forEach(r => {
+      const source = String(r[mapping.source] || "").trim();
+      const target = String(r[mapping.target] || "").trim();
+      const value = Number(r[mapping.value]);
+      if (!source || !target || source === target || !isFinite(value) || value <= 0) return;
+      if (!nodeNames.includes(source)) nodeNames.push(source);
+      if (!nodeNames.includes(target)) nodeNames.push(target);
+      links.push({ source, target, value });
+    });
+    return { nodes: nodeNames.map(name => ({ name })), links };
+  }
+
+  const catIdx = mapping.category;
+  const seriesIdx = mapping.series;
+  if (!seriesIdx.length) return null;
+  const categories = rows.map(r => String(r[catIdx] || ""));
+  const seriesNames = seriesIdx.map(i => headers[i]);
+  const seriesData = seriesIdx.map(i => rows.map(r => {
+    const v = Number(r[i]);
+    return isFinite(v) ? v : 0;
+  }));
+  return { categories, seriesNames, seriesData };
+}
+
+function renderFocusChart(){
+  const el = document.getElementById("focusChart");
+  if (!el) return;
+  echarts.registerTheme(state.name, buildTheme());
+  if (chartInstances.focus) chartInstances.focus.dispose();
+  chartInstances.focus = echarts.init(el, state.name);
+
+  const t = state.focusChartType;
+  const customData = state.dataSource === "upload" ? getMappedUploadDataset(t) : null;
+  const d = customData || workingData.trend;
+  let opt = {};
+
+  if (t === "line" || t === "lineSmooth") {
+    opt = {
+      title: { text: customData ? `${uploadState.fileName} (Line)` : "Datasets Over Time", left: "left" },
+      tooltip: { trigger: "axis" },
+      legend: { bottom: 0, data: d.seriesNames },
+      grid: { left: 45, right: 25, top: 50, bottom: 40 },
+      xAxis: { type: "category", data: d.categories, boundaryGap: false },
+      yAxis: { type: "value" },
+      series: d.seriesNames.map((name, i) => ({
+        name, type: "line", data: d.seriesData[i], smooth: (t === "lineSmooth")
+      }))
+    };
+  } else if (t === "area" || t === "stackedArea") {
+    const isStacked = t === "stackedArea";
+    opt = {
+      title: { text: customData ? `${uploadState.fileName} (Area)` : "Datasets Over Time (Area)", left: "left" },
+      tooltip: { trigger: "axis" },
+      legend: { bottom: 0, data: d.seriesNames },
+      grid: { left: 45, right: 25, top: 50, bottom: 40 },
+      xAxis: { type: "category", data: d.categories, boundaryGap: false },
+      yAxis: { type: "value" },
+      series: d.seriesNames.map((name, i) => ({
+        name, type: "line", areaStyle: {}, stack: isStacked ? "total" : null, data: d.seriesData[i], smooth: state.lineSmooth
+      }))
+    };
+  } else if (t === "bar" || t === "stackedBar") {
+    const barData = customData || workingData.stackedBar;
+    const isStacked = t === "stackedBar";
+    opt = {
+      title: { text: customData ? `${uploadState.fileName} (Bar)` : "Funding Distribution by Sector", left: "left" },
+      tooltip: { trigger: "axis" },
+      legend: { bottom: 0, data: barData.seriesNames },
+      grid: { left: 45, right: 25, top: 50, bottom: 60 },
+      xAxis: { type: "category", data: barData.categories, axisLabel: { interval: 0, rotate: 30 } },
+      yAxis: { type: "value" },
+      series: barData.seriesNames.map((name, i) => ({
+        name, type: "bar", stack: isStacked ? "total" : null, data: barData.seriesData[i],
+        itemStyle: { borderRadius: (isStacked && i === barData.seriesNames.length - 1) || !isStacked ? [state.barRadius, state.barRadius, 0, 0] : 0 }
+      }))
+    };
+  } else if (t === "horizontalBar") {
+    const d = workingData.stackedBar;
+    opt = {
+      title: { text: "Sector Metrics (Horizontal Bar)" },
+      grid: { left: 110, right: 30, top: 40, bottom: 30 },
+      xAxis: { type: "value" },
+      yAxis: { type: "category", data: d.categories },
+      series: [{ type: "bar", data: d.seriesData[0], itemStyle: { borderRadius: [0, state.barRadius, state.barRadius, 0] } }]
+    };
+  } else if (t === "pie" || t === "doughnut") {
+    opt = getPieOption();
+    opt.series[0].radius = t === "doughnut" ? ["40%", "70%"] : "70%";
+    opt.legend = { show: true, bottom: 0 };
+  } else if (t === "funnel") {
+    const d = workingData.pie;
+    opt = {
+      title: { text: "Dataset Publishing Pipeline (Funnel)", left: "center" },
+      legend: { bottom: 0 },
+      series: [{
+        type: "funnel", left: "15%", width: "70%", top: 50, bottom: 40,
+        data: d.categories.slice(0, 5).map((name, i) => ({ name, value: d.seriesData[0][i] }))
+      }]
+    };
+  } else if (t === "treemap") {
+    opt = {
+      title: { text: "Datasets Distributed by Sector (Treemap)" },
+      series: [{ type: "treemap", top: 40, bottom: 10, data: workingData.treemap }]
+    };
+  } else if (t === "boxplot") {
+    opt = {
+      title: { text: "Sector Response Distribution (Boxplot)" },
+      grid: { left: 45, right: 20, top: 50, bottom: 50 },
+      xAxis: { type: "category", data: SECTORS, axisLabel: { interval: 0, rotate: 30 } },
+      yAxis: { type: "value" },
+      series: [{ type: "boxplot", data: workingData.boxplot }]
+    };
+  } else if (t === "scatter" || t === "bubble") {
+    opt = getScatterOption();
+  } else if (t === "radar") {
+    opt = getRadarOption();
+  } else if (t === "heatmap") {
+    opt = getHeatmapOption();
+  } else if (t === "candlestick") {
+    opt = getCandlestickOption();
+  } else if (t === "gauge") {
+    opt = getGaugeOption();
+  } else if (t === "sankey") {
+    opt = getSankeyOption();
+  } else if (t === "map") {
+    if (worldMapStatus !== "ready") {
+      opt = {
+        title: { text: "International Data Partnerships by Country" },
+        graphic: {
+          type: "text", left: "center", top: "middle",
+          style: {
+            text: worldMapStatus === "error" ? "Map data unavailable (network/CDN offline)." : "Loading world map...",
+            fontSize: 14, fontFamily: state.fontFamily, fill: state.textColor
+          }
+        }
+      };
+    } else {
+      const data = Object.entries(workingData.map).map(([name, value]) => ({ name, value }));
+      opt = {
+        title: { text: "International Data Partnerships by Country" },
+        tooltip: { trigger: "item", formatter: p => p.value != null ? `${p.name}: ${p.value}` : `${p.name}: no data` },
+        visualMap: {
+          min: 0, max: 200, left: "left", bottom: 20, calculable: true,
+          inRange: { color: [state.backgroundColor, state.palette[0] || "#06B6D4"] },
+          textStyle: { color: state.textColor }
+        },
+        series: [{ type: "map", map: "world", roam: true, data }]
+      };
+    }
+  } else if (t === "graph") {
+    const nodes = ["CDRI", "Datahub", "Ministries", "Donors", "Researchers", "Open Data", "Surveys"].map((n, i) => ({
+      id: String(i), name: n, symbolSize: 28 + (n === "CDRI" ? 18 : 0)
+    }));
+    const links = [[0,1],[1,2],[1,3],[1,4],[0,5],[5,6]].map(([a,b]) => ({ source: String(a), target: String(b) }));
+    opt = {
+      title: { text: "CDRI Datahub Architecture & Network" },
+      series: [{
+        type: "graph", layout: "force", roam: true,
+        label: { show: true, color: state.textColor },
+        force: { repulsion: 200, edgeLength: 100 },
+        data: nodes, links,
+        lineStyle: { color: state.axisLineColor, curveness: 0.15 }
+      }]
+    };
+  } else {
+    opt = getLineOption();
+  }
+
+  // DataZoom for category and numerical axes
+  if (opt.xAxis && opt.xAxis.type === "category") {
+    opt.dataZoom = [
+      { type: "inside" },
+      { type: "slider", bottom: 8, height: 16, borderColor: "transparent" }
+    ];
+  }
+
+  chartInstances.focus.setOption(opt);
+}
+
+
+function renderAll(){
+  echarts.registerTheme(state.name, buildTheme());
+  if (state.viewMode === "dashboard") {
+    initDashboardCharts();
+  } else {
+    renderFocusChart();
+  }
+  updateWCAGAnalysis();
+  updateModalCodeViewer();
+}
+
+function resizeAll(){
+  Object.values(chartInstances).forEach(c => { if (c) c.resize(); });
+}
+window.addEventListener("resize", resizeAll);
+
+/* ==================================================================
+   7. UI View Modes (Dashboard Grid vs Single Focus)
+   ================================================================== */
+function switchViewMode(mode){
+  state.viewMode = mode;
+  const isDash = mode === "dashboard";
+  document.getElementById("btnModeDashboard").classList.toggle("active", isDash);
+  document.getElementById("btnModeFocus").classList.toggle("active", !isDash);
+  document.getElementById("dashboardGrid").style.display = isDash ? "grid" : "none";
+  document.getElementById("focusView").style.display = isDash ? "none" : "flex";
+
+  if (isDash){
+    document.getElementById("viewHeadingTitle").textContent = "Theme Preview Dashboard";
+    document.getElementById("viewHeadingMeta").textContent = "Synchronized live preview across 9 core chart families";
+    setTimeout(initDashboardCharts, 50);
+  } else {
+    document.getElementById("viewHeadingTitle").textContent = "Focused Single Chart Inspection";
+    document.getElementById("viewHeadingMeta").textContent = "Deep-dive into individual chart type options";
+    setTimeout(renderFocusChart, 50);
+  }
+}
+
+function openFocusMode(chartType){
+  state.focusChartType = chartType;
+  document.getElementById("focusChartTypeSelect").value = chartType;
+  switchViewMode("focus");
+}
+
+document.getElementById("btnModeDashboard").addEventListener("click", () => switchViewMode("dashboard"));
+document.getElementById("btnModeFocus").addEventListener("click", () => switchViewMode("focus"));
+document.getElementById("focusChartTypeSelect").addEventListener("change", e => {
+  state.focusChartType = e.target.value;
+  renderFocusChart();
+});
+
+/* ==================================================================
+   8. Palette Swatches & Management
+   ================================================================== */
+function renderPaletteSwatches(){
+  const grid = document.getElementById("paletteGrid");
+  grid.innerHTML = "";
+  document.getElementById("paletteCountBadge").textContent = `${state.palette.length} colors`;
+
+  state.palette.forEach((colorHex, idx) => {
+    const card = document.createElement("div");
+    card.className = "palette-swatch-card";
+
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.value = colorHex;
+    colorInput.title = `Color ${idx + 1}`;
+    colorInput.addEventListener("input", e => {
+      state.palette[idx] = e.target.value;
+      hexLabel.textContent = e.target.value;
+      renderAll();
+    });
+
+    const hexLabel = document.createElement("span");
+    hexLabel.className = "palette-swatch-hex";
+    hexLabel.textContent = colorHex;
+
+    const delBtn = document.createElement("div");
+    delBtn.className = "palette-swatch-del";
+    delBtn.innerHTML = "&times;";
+    delBtn.title = "Delete color";
+    delBtn.addEventListener("click", () => {
+      if (state.palette.length <= 2) {
+        showToast("Theme requires at least 2 colors! ⚠️");
+        return;
+      }
+      state.palette.splice(idx, 1);
+      renderPaletteSwatches();
+      renderAll();
+    });
+
+    const wcagBadge = document.createElement("div");
+    wcagBadge.className = "swatch-wcag-badge";
+    wcagBadge.textContent = "!";
+
+    card.appendChild(colorInput);
+    card.appendChild(hexLabel);
+    card.appendChild(delBtn);
+    card.appendChild(wcagBadge);
+    grid.appendChild(card);
+  });
+
+  updateWCAGAnalysis();
+}
+
+document.getElementById("btnAddColor").addEventListener("click", () => {
+  if (state.palette.length >= 16) {
+    showToast("Maximum 16 colors reached! ⚠️");
+    return;
+  }
+  const nextColor = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, "0");
+  state.palette.push(nextColor);
+  renderPaletteSwatches();
+  renderAll();
+  showToast("Added new swatch! 🎨");
+});
+
+document.getElementById("btnReversePalette").addEventListener("click", () => {
+  state.palette.reverse();
+  renderPaletteSwatches();
+  renderAll();
+  showToast("Palette reversed!");
+});
+
+document.getElementById("paletteQuickPreset").addEventListener("change", e => {
+  const v = e.target.value;
+  if (!v) return;
+  const presets = {
+    datahub: ["#14A0B8", "#4994DF", "#4C41C8", "#8F3D8F", "#DA2F54", "#F59847", "#BD910F", "#485922"],
+    vibrant: ["#00C49F", "#0088FE", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D", "#A4DE6C", "#D0ED57"],
+    warm: ["#E76F51", "#F4A261", "#E9C46A", "#2A9D8F", "#264653", "#D62828"],
+    cool: ["#03045E", "#023E8A", "#0077B6", "#0096C7", "#00B4D8", "#48CAE4"],
+    forest: ["#2D6A4F", "#40916C", "#52B788", "#74C69D", "#95D5B2", "#D8F3DC"],
+    highcontrast: ["#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2"]
+  };
+  if (presets[v]){
+    state.palette = [...presets[v]];
+    renderPaletteSwatches();
+    renderAll();
+    showToast("Palette preset applied!");
+  }
+  e.target.value = "";
+});
+
+/* ==================================================================
+   9. Preset System & Sidebar Controls Sync
+   ================================================================== */
+function applyPreset(presetKey){
+  const p = PRESETS[presetKey];
+  if (!p) return;
+  Object.assign(state, JSON.parse(JSON.stringify(p)));
+  syncControlsFromState();
+  renderPaletteSwatches();
+  renderAll();
+  showToast(`Loaded "${p.name}" preset! ✨`);
+}
+
+function syncControlsFromState(){
+  document.getElementById("themeNameInput").value = state.name;
+  document.getElementById("ctrlBgColor").value = state.backgroundColor;
+  document.getElementById("ctrlBgColorHex").value = state.backgroundColor;
+  document.getElementById("ctrlBgTransparent").checked = state.bgTransparent;
+  document.getElementById("ctrlTitleColor").value = state.titleColor;
+  document.getElementById("ctrlTitleColorHex").value = state.titleColor;
+  document.getElementById("ctrlSubtitleColor").value = state.subtitleColor;
+  document.getElementById("ctrlSubtitleColorHex").value = state.subtitleColor;
+  document.getElementById("ctrlTextColor").value = state.textColor;
+  document.getElementById("ctrlTextColorHex").value = state.textColor;
+
+  document.getElementById("ctrlAxisLineShow").checked = state.axisLineShow;
+  document.getElementById("ctrlAxisLineColor").value = state.axisLineColor;
+  document.getElementById("ctrlAxisLineColorHex").value = state.axisLineColor;
+  document.getElementById("ctrlSplitLineShow").checked = state.splitLineShow;
+  document.getElementById("ctrlSplitLineColor").value = state.splitLineColor;
+  document.getElementById("ctrlSplitLineColorHex").value = state.splitLineColor;
+  document.getElementById("ctrlSplitLineType").value = state.splitLineType;
+
+  document.getElementById("ctrlLineWidth").value = state.lineWidth;
+  document.getElementById("valLineWidth").textContent = state.lineWidth + "px";
+  document.getElementById("ctrlSymbolSize").value = state.symbolSize;
+  document.getElementById("valSymbolSize").textContent = state.symbolSize + "px";
+  document.getElementById("ctrlSymbolType").value = state.symbolType;
+  document.getElementById("ctrlLineSmooth").checked = state.lineSmooth;
+  document.getElementById("ctrlBarRadius").value = state.barRadius;
+  document.getElementById("valBarRadius").textContent = state.barRadius + "px";
+  document.getElementById("ctrlPieRadius").value = state.pieRadius;
+  document.getElementById("valPieRadius").textContent = state.pieRadius + "px";
+
+  document.getElementById("ctrlTooltipBg").value = state.tooltipBg.startsWith("#") ? state.tooltipBg : "#0F172A";
+  document.getElementById("ctrlTooltipBgHex").value = state.tooltipBg;
+  document.getElementById("ctrlTooltipText").value = state.tooltipText;
+  document.getElementById("ctrlTooltipTextHex").value = state.tooltipText;
+  document.getElementById("ctrlTooltipBorderRadius").value = state.tooltipRadius;
+  document.getElementById("valTooltipRadius").textContent = state.tooltipRadius + "px";
+
+  // Canvas mode
+  setCanvasDark(state.canvasDark);
+}
+
+document.getElementById("presetSelect").addEventListener("change", e => applyPreset(e.target.value));
+
+/* Color Vision Deficiency Filter Preview */
+document.getElementById("cvdSelect").addEventListener("change", e => {
+  const filterVal = e.target.value;
+  const stage = document.getElementById("canvasStage");
+  if (filterVal === "none") {
+    stage.style.filter = "none";
+  } else {
+    stage.style.filter = `url(#${filterVal})`;
+  }
+});
+
+/* Canvas Dark / Light Toggle */
+function setCanvasDark(dark){
+  state.canvasDark = dark;
+  document.getElementById("main").classList.toggle("dark-canvas", dark);
+  document.getElementById("canvasBgIcon").textContent = dark ? "☀" : "☾";
+  document.getElementById("canvasBgText").textContent = dark ? "Light Canvas" : "Dark Canvas";
+}
+document.getElementById("btnToggleCanvasBg").addEventListener("click", () => {
+  setCanvasDark(!state.canvasDark);
+});
+
+/* Wire up Form Inputs to State */
+document.getElementById("themeNameInput").addEventListener("input", e => { state.name = e.target.value.trim() || "cdriTheme"; updateModalCodeViewer(); });
+
+// Color picker inputs
+function bindColorPair(pickerId, hexId, stateKey){
+  const p = document.getElementById(pickerId);
+  const h = document.getElementById(hexId);
+  p.addEventListener("input", e => {
+    state[stateKey] = e.target.value;
+    h.value = e.target.value;
+    renderAll();
+  });
+  h.addEventListener("change", e => {
+    if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)){
+      state[stateKey] = e.target.value;
+      p.value = e.target.value;
+      renderAll();
+    }
+  });
+}
+bindColorPair("ctrlBgColor", "ctrlBgColorHex", "backgroundColor");
+bindColorPair("ctrlTitleColor", "ctrlTitleColorHex", "titleColor");
+bindColorPair("ctrlSubtitleColor", "ctrlSubtitleColorHex", "subtitleColor");
+bindColorPair("ctrlTextColor", "ctrlTextColorHex", "textColor");
+bindColorPair("ctrlAxisLineColor", "ctrlAxisLineColorHex", "axisLineColor");
+bindColorPair("ctrlSplitLineColor", "ctrlSplitLineColorHex", "splitLineColor");
+bindColorPair("ctrlTooltipBg", "ctrlTooltipBgHex", "tooltipBg");
+bindColorPair("ctrlTooltipText", "ctrlTooltipTextHex", "tooltipText");
+
+document.getElementById("ctrlBgTransparent").addEventListener("change", e => { state.bgTransparent = e.target.checked; renderAll(); });
+document.getElementById("ctrlAxisLineShow").addEventListener("change", e => { state.axisLineShow = e.target.checked; renderAll(); });
+document.getElementById("ctrlSplitLineShow").addEventListener("change", e => { state.splitLineShow = e.target.checked; renderAll(); });
+document.getElementById("ctrlSplitLineType").addEventListener("change", e => { state.splitLineType = e.target.value; renderAll(); });
+
+document.getElementById("ctrlLineWidth").addEventListener("input", e => {
+  state.lineWidth = Number(e.target.value);
+  document.getElementById("valLineWidth").textContent = state.lineWidth + "px";
+  renderAll();
+});
+document.getElementById("ctrlSymbolSize").addEventListener("input", e => {
+  state.symbolSize = Number(e.target.value);
+  document.getElementById("valSymbolSize").textContent = state.symbolSize + "px";
+  renderAll();
+});
+document.getElementById("ctrlSymbolType").addEventListener("change", e => { state.symbolType = e.target.value; renderAll(); });
+document.getElementById("ctrlLineSmooth").addEventListener("change", e => { state.lineSmooth = e.target.checked; renderAll(); });
+
+document.getElementById("ctrlBarRadius").addEventListener("input", e => {
+  state.barRadius = Number(e.target.value);
+  document.getElementById("valBarRadius").textContent = state.barRadius + "px";
+  renderAll();
+});
+document.getElementById("ctrlPieRadius").addEventListener("input", e => {
+  state.pieRadius = Number(e.target.value);
+  document.getElementById("valPieRadius").textContent = state.pieRadius + "px";
+  renderAll();
+});
+document.getElementById("ctrlTooltipBorderRadius").addEventListener("input", e => {
+  state.tooltipRadius = Number(e.target.value);
+  document.getElementById("valTooltipRadius").textContent = state.tooltipRadius + "px";
+  renderAll();
+});
+
+document.getElementById("ctrlFontFamily").addEventListener("change", e => {
+  state.fontFamily = e.target.value;
+  renderAll();
+});
+
+/* Accordion toggles */
+document.querySelectorAll(".acc-header").forEach(h => {
+  h.addEventListener("click", () => {
+    const parent = h.closest(".acc-item");
+    parent.classList.toggle("open");
+  });
+});
+
+/* Top Buttons */
+document.getElementById("btnRandomize").addEventListener("click", randomizeData);
+document.getElementById("btnReset").addEventListener("click", () => {
+  applyPreset("cdriLight");
+  document.getElementById("presetSelect").value = "cdriLight";
+});
+
+/* ==================================================================
+   10. Code & Export Modal
+   ================================================================== */
+const modal = document.getElementById("exportModal");
+let activeExportTab = "builderJson";
+
+function updateModalCodeViewer(){
+  const viewer = document.getElementById("modalCodeViewer");
+  if (!viewer) return;
+
+  if (activeExportTab === "builderJson"){
+    viewer.textContent = JSON.stringify(toThemeBuilderJSON(), null, 2);
+  } else if (activeExportTab === "nativeJson"){
+    viewer.textContent = JSON.stringify(buildTheme(), null, 2);
+  } else if (activeExportTab === "jsSnippet"){
+    const themeName = state.name || "cdriDatahubTheme";
+    viewer.textContent =
+`// Apache ECharts Theme: ${themeName}
+// Generated with CDRI Datahub Theme Builder
+
+export const ${themeName} = ${JSON.stringify(buildTheme(), null, 2)};
+
+// Direct browser registration:
+// echarts.registerTheme('${themeName}', ${themeName});
+`;
+  }
+}
+
+document.getElementById("btnOpenExportModal").addEventListener("click", () => {
+  updateModalCodeViewer();
+  modal.showModal();
+});
+document.getElementById("btnCloseExportModal").addEventListener("click", () => modal.close());
+
+document.querySelectorAll(".modal-tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".modal-tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeExportTab = btn.dataset.tab;
+    updateModalCodeViewer();
+  });
+});
+
+document.getElementById("btnCopyModalCode").addEventListener("click", () => {
+  const code = document.getElementById("modalCodeViewer").textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    showToast("Code copied to clipboard! 📋");
+  }).catch(() => {
+    showToast("Clipboard copy failed, please select and copy manually.");
+  });
+});
+
+document.getElementById("btnDownloadJson").addEventListener("click", () => {
+  const jsonContent = JSON.stringify(toThemeBuilderJSON(), null, 2);
+  const blob = new Blob([jsonContent], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${state.name || "cdri-theme"}-builder.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Downloaded Theme Builder JSON! 💾");
+});
+
+document.getElementById("btnDownloadJs").addEventListener("click", () => {
+  const themeName = state.name || "cdriDatahubTheme";
+  const code =
+`// Apache ECharts Theme: ${themeName}
+export const ${themeName} = ${JSON.stringify(buildTheme(), null, 2)};
+if (typeof echarts !== 'undefined') {
+  echarts.registerTheme('${themeName}', ${themeName});
+}
+`;
+  const blob = new Blob([code], { type: "text/javascript" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${themeName}.js`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Downloaded Theme JS Module! 💾");
+});
+
+/* Import Theme JSON */
+document.getElementById("btnImport").addEventListener("click", () => document.getElementById("importFileInput").click());
+document.getElementById("importFileInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try {
+      const obj = JSON.parse(evt.target.result);
+      const t = obj.theme || obj;
+      if (Array.isArray(t.color) && t.color.length) state.palette = t.color;
+      if (t.backgroundColor && !t.backgroundColor.startsWith("rgba(0,0,0,0)")) state.backgroundColor = t.backgroundColor;
+      if (t.titleColor) state.titleColor = t.titleColor;
+      if (t.textColor) state.textColor = t.textColor;
+      if (t.lineWidth) state.lineWidth = Number(t.lineWidth);
+      if (t.symbolSize) state.symbolSize = Number(t.symbolSize);
+      if (obj.themeName) state.name = obj.themeName;
+
+      syncControlsFromState();
+      renderPaletteSwatches();
+      renderAll();
+      showToast("Theme imported successfully! 🎉");
+    } catch(err) {
+      alert("Invalid Theme JSON file.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+/* ==================================================================
+   10.5 Custom Data Upload (CSV / JSON) & Dynamic Column Mapping
+   ================================================================== */
+const uploadState = {
+  headers: [],
+  rows: [],
+  colNumeric: [],
+  fileName: "",
+  mapping: { category: 0, series: [], x: null, y: null, group: null, size: null, source: null, target: null, value: null }
+};
+
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQuotes){
+      if (c === '"'){
+        if (text[i+1] === '"'){ field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ','){ row.push(field); field = ""; }
+      else if (c === '\n'){ row.push(field); rows.push(row); row = []; field = ""; }
+      else if (c === '\r'){ /* skip */ }
+      else field += c;
+    }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ""));
+}
+
+function parseUploadedText(text, isJson){
+  if (isJson){
+    let data;
+    try { data = JSON.parse(text); } catch(e){ throw new Error("File is not valid JSON."); }
+    if (!Array.isArray(data) || !data.length || typeof data[0] !== "object"){
+      throw new Error('Expected JSON array of objects, e.g. [{"Category":"Education","Value":42}, ...].');
+    }
+    const headers = [];
+    data.forEach(row => Object.keys(row).forEach(k => { if (!headers.includes(k)) headers.push(k); }));
+    const rows = data.map(row => headers.map(h => row[h] !== undefined ? row[h] : ""));
+    return { headers, rows };
+  }
+  const table = parseCSV(text);
+  if (table.length < 2) throw new Error("Expected a CSV with a header row and at least one data row.");
+  const headers = table[0].map(h => h.trim());
+  const rows = table.slice(1).map(r => headers.map((_, i) => (r[i] !== undefined ? r[i].trim() : "")));
+  return { headers, rows };
+}
+
+function isNumeric(v){
+  if (v === "" || v === null || v === undefined) return false;
+  return isFinite(Number(v));
+}
+
+function computeColTypes(headers, rows){
+  return headers.map((_, ci) => {
+    const vals = rows.map(r => r[ci]).filter(v => v !== "" && v !== null && v !== undefined);
+    return vals.length > 0 && vals.every(isNumeric);
+  });
+}
+
+function autoMapUploadColumns(){
+  const { colNumeric, headers } = uploadState;
+  const firstText = colNumeric.findIndex(n => !n);
+  uploadState.mapping.category = firstText >= 0 ? firstText : 0;
+  uploadState.mapping.series = colNumeric
+    .map((n, i) => n && i !== uploadState.mapping.category ? i : -1)
+    .filter(i => i >= 0)
+    .slice(0, 8);
+  const numericCols = colNumeric.map((n, i) => n ? i : -1).filter(i => i >= 0);
+  uploadState.mapping.x = numericCols.length ? numericCols[0] : null;
+  uploadState.mapping.y = numericCols.length > 1 ? numericCols[1] : null;
+  uploadState.mapping.size = numericCols.length > 2 ? numericCols[2] : null;
+  uploadState.mapping.group = (firstText >= 0 && firstText !== uploadState.mapping.x) ? firstText : null;
+  uploadState.mapping.source = headers.length ? 0 : null;
+  uploadState.mapping.target = headers.length > 1 ? 1 : null;
+  const valCol = numericCols.find(i => i !== uploadState.mapping.source && i !== uploadState.mapping.target);
+  uploadState.mapping.value = valCol !== undefined ? valCol : (numericCols.length ? numericCols[0] : null);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function colOptions(headers, numericMask, selected, numericOnly){
+  return headers.map((h, i) => {
+    if (numericOnly && numericMask && !numericMask[i]) return "";
+    return `<option value="${i}" ${i === selected ? "selected" : ""}>${escapeHtml(h)}</option>`;
+  }).join("");
+}
+
+function renderUploadPanel(){
+  const { headers, rows } = uploadState;
+  const panel = document.getElementById("uploadPanel");
+  if (!headers.length){
+    panel.style.display = "none";
+    return;
+  }
+  panel.style.display = "block";
+  document.getElementById("uploadSummary").textContent = `${uploadState.fileName} (${rows.length} rows, ${headers.length} columns)`;
+
+  let previewHtml = "<tr>" + headers.map(h => `<th>${escapeHtml(h)}</th>`).join("") + "</tr>";
+  rows.slice(0, 5).forEach(r => {
+    previewHtml += "<tr>" + r.map(v => `<td>${escapeHtml(v)}</td>`).join("") + "</tr>";
+  });
+  document.getElementById("uploadPreviewTable").innerHTML = previewHtml;
+
+  const t = state.focusChartType;
+  const mapArea = document.getElementById("mappingArea");
+
+  if (t === "scatter" || t === "bubble"){
+    mapArea.innerHTML = `
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">X Column</label><select id="mapX" class="ctrl-select" style="width:140px;">${colOptions(headers, uploadState.colNumeric, uploadState.mapping.x, true)}</select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Y Column</label><select id="mapY" class="ctrl-select" style="width:140px;">${colOptions(headers, uploadState.colNumeric, uploadState.mapping.y, true)}</select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Size / Weight</label><select id="mapSize" class="ctrl-select" style="width:140px;">${colOptions(headers, uploadState.colNumeric, uploadState.mapping.size, true)}</select></div>
+      </div>
+    `;
+    document.getElementById("mapX").addEventListener("change", e => { uploadState.mapping.x = Number(e.target.value); renderFocusChart(); });
+    document.getElementById("mapY").addEventListener("change", e => { uploadState.mapping.y = Number(e.target.value); renderFocusChart(); });
+    document.getElementById("mapSize").addEventListener("change", e => { uploadState.mapping.size = Number(e.target.value); renderFocusChart(); });
+  } else if (t === "sankey"){
+    mapArea.innerHTML = `
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Source Column</label><select id="mapSource" class="ctrl-select" style="width:140px;">${colOptions(headers, null, uploadState.mapping.source, false)}</select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Target Column</label><select id="mapTarget" class="ctrl-select" style="width:140px;">${colOptions(headers, null, uploadState.mapping.target, false)}</select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Flow Value</label><select id="mapVal" class="ctrl-select" style="width:140px;">${colOptions(headers, uploadState.colNumeric, uploadState.mapping.value, true)}</select></div>
+      </div>
+    `;
+    document.getElementById("mapSource").addEventListener("change", e => { uploadState.mapping.source = Number(e.target.value); renderFocusChart(); });
+    document.getElementById("mapTarget").addEventListener("change", e => { uploadState.mapping.target = Number(e.target.value); renderFocusChart(); });
+    document.getElementById("mapVal").addEventListener("change", e => { uploadState.mapping.value = Number(e.target.value); renderFocusChart(); });
+  } else {
+    const seriesChecks = headers.map((h, i) => (uploadState.colNumeric[i] && i !== uploadState.mapping.category)
+      ? `<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;"><input type="checkbox" data-col="${i}" ${uploadState.mapping.series.includes(i) ? "checked" : ""}> ${escapeHtml(h)}</label>`
+      : ""
+    ).join("");
+    mapArea.innerHTML = `
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;">
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Category / X Axis</label><select id="mapCategory" class="ctrl-select" style="width:150px;">${colOptions(headers, null, uploadState.mapping.category, false)}</select></div>
+        <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Series Columns</label><div style="display:flex;flex-wrap:wrap;gap:8px;max-width:320px;">${seriesChecks}</div></div>
+      </div>
+    `;
+    document.getElementById("mapCategory").addEventListener("change", e => {
+      uploadState.mapping.category = Number(e.target.value);
+      uploadState.mapping.series = uploadState.mapping.series.filter(i => i !== uploadState.mapping.category);
+      renderUploadPanel();
+      renderFocusChart();
+    });
+    mapArea.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      cb.addEventListener("change", e => {
+        const colIdx = Number(e.target.dataset.col);
+        if (e.target.checked) uploadState.mapping.series.push(colIdx);
+        else uploadState.mapping.series = uploadState.mapping.series.filter(x => x !== colIdx);
+        renderFocusChart();
+      });
+    });
+  }
+}
+
+/* Data Source Switcher Buttons */
+document.getElementById("btnSourceSample").addEventListener("click", () => {
+  state.dataSource = "sample";
+  document.getElementById("btnSourceSample").classList.add("active");
+  document.getElementById("btnSourceUpload").classList.remove("active");
+  document.getElementById("sidebarUploadArea").style.display = "none";
+  document.getElementById("uploadPanel").style.display = "none";
+  renderAll();
+  showToast("Switched to CDRI Sample Metrics! 📊");
+});
+
+document.getElementById("btnSourceUpload").addEventListener("click", () => {
+  state.dataSource = "upload";
+  document.getElementById("btnSourceUpload").classList.add("active");
+  document.getElementById("btnSourceSample").classList.remove("active");
+  document.getElementById("sidebarUploadArea").style.display = "block";
+  if (!uploadState.headers.length) {
+    document.getElementById("customFileInput").click();
+  } else {
+    switchViewMode("focus");
+    renderUploadPanel();
+    renderFocusChart();
+  }
+});
+
+document.getElementById("btnTriggerUpload").addEventListener("click", () => {
+  document.getElementById("customFileInput").click();
+});
+
+document.getElementById("customFileInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const isJson = /\.json$/i.test(file.name) || file.type === "application/json";
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try {
+      const { headers, rows } = parseUploadedText(evt.target.result, isJson);
+      uploadState.headers = headers;
+      uploadState.rows = rows;
+      uploadState.colNumeric = computeColTypes(headers, rows);
+      uploadState.fileName = file.name;
+      autoMapUploadColumns();
+
+      document.getElementById("sidebarUploadFileLabel").textContent = `${file.name} (${rows.length} rows)`;
+      switchViewMode("focus");
+      renderUploadPanel();
+      renderFocusChart();
+      showToast(`Loaded ${file.name}! 📁`);
+    } catch(err) {
+      alert("Error parsing file: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+
+
+/* ==================================================================
+   11. Bootstrap Application
+   ================================================================== */
+syncControlsFromState();
+renderPaletteSwatches();
+renderAll();
+</script>
+</body>
+</html>
