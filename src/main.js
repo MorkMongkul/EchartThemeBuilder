@@ -276,12 +276,6 @@ function updateSidebarUI() {
       : '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><path d="M14 9l-3 3 3 3"/>';
   }
 
-  // Update toolbar toggle text
-  const toolbarText = document.getElementById("toolbarSidebarText");
-  if (toolbarText) {
-    toolbarText.textContent = sidebarState.collapsed ? "Show Controls" : "Hide Controls";
-  }
-
   // Update floating button status in sidebar header
   const floatBtn = document.getElementById("btnSidebarFloatToggle");
   if (floatBtn) {
@@ -559,12 +553,6 @@ function bindEvents() {
 
   const btnSidebarFloatToggle = document.getElementById("btnSidebarFloatToggle");
   if (btnSidebarFloatToggle) btnSidebarFloatToggle.addEventListener("click", () => toggleFloatingSidebar());
-
-  const floatingSidebarReveal = document.getElementById("floatingSidebarReveal");
-  if (floatingSidebarReveal) floatingSidebarReveal.addEventListener("click", () => toggleSidebar(false));
-
-  const toolbarSidebarBtn = document.getElementById("toolbarSidebarBtn");
-  if (toolbarSidebarBtn) toolbarSidebarBtn.addEventListener("click", () => toggleSidebar());
 
   // Global Shortcut: Ctrl+B or Cmd+B to toggle sidebar
   window.addEventListener("keydown", e => {
